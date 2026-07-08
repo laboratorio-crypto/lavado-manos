@@ -977,3 +977,84 @@
   </script>
 </body>
 </html>
+function doPost(e) {
+  try {
+    // Acceder a la hoja de cálculo activa
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    
+    // Si la hoja está completamente vacía, creamos los encabezados automáticamente
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow([
+        "Fecha de Registro (Sistema)", 
+        "ID de Auditoría",
+        "Fecha del Turno", 
+        "Turno Evaluado", 
+        "Área o Servicio", 
+        "Auditor / Observador", 
+        "Firma Auditor", 
+        "Firma Supervisor", 
+        "% Cumplimiento General",
+        "N° de Observación", 
+        "Hora de Obs.", 
+        "Categoría Profesional", 
+        "Momento OMS", 
+        "Acción Realizada", 
+        "¿Cumple con la Higiene?", 
+        "Detalles / Comentarios"
+      ]);
+      
+      // Aplicar color azul elegante, texto blanco y negrita a la cabecera
+      sheet.getRange(1, 1, 1, 16)
+           .setBackground("#1e3a8a") 
+           .setFontColor("#ffffff")
+           .setFontWeight("bold")
+           .setHorizontalAlignment("center");
+      
+      // Ajustar anchos iniciales de columnas para una mejor lectura
+      sheet.setColumnWidth(1, 180);
+      sheet.setColumnWidth(2, 180);
+      sheet.setColumnWidth(3, 100);
+      sheet.setColumnWidth(4, 100);
+      sheet.setColumnWidth(5, 200);
+      sheet.setColumnWidth(6, 200);
+    }
+    
+    // Decodificar la carga útil JSON enviada por la aplicación
+    var data = JSON.parse(e.postData.contents);
+    
+    // Extraer campos generales
+    var id = data.id || "";
+    var fecha = data.fecha || "";
+    var turno = data.turno || "";
+    var area = data.area || "";
+    var auditor = data.auditor || "";
+    var pct = data.porcentajeCumplimiento !== undefined ? data.porcentajeCumplimiento + "%" : "";
+    var fAuditor = data.firmaAuditor || "";
+    var fSupervisor = data.firmaSupervisor || "";
+    var obsList = data.observaciones || [];
+    
+    var timestamp = new Date(); // Fecha y hora exacta de guardado
+    
+    // Recorremos la lista de observaciones y las guardamos como registros independientes
+    // Esto facilita la creación de tablas dinámicas y gráficos estadísticos en Sheets
+    for (var i = 0; i < obsList.length; i++) {
+      var obs = obsList[i];
+      sheet.appendRow([
+        timestamp,
+        id,
+        fecha,
+        turno,
+        area,
+        auditor,
+        fAuditor,
+        fSupervisor,
+        pct,
+        (i + 1),
+        obs.hora || "",
+        obs.categoria || "",
+        "Momento " + (obs.momento || ""),
+        obs.accion || "",
+        obs.cumple || "",
+        obs.notas || ""
+      ]);
+    }
