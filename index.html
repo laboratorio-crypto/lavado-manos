@@ -1,1060 +1,1162 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auditoría de Higiene de Manos OMS - NTP-ISO 20658:2024</title>
-  <!-- Tailwind CSS CDN para el diseño moderno -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons para los iconos modernos -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    @media print {
-      body {
-        background-color: white !important;
-        color: black !important;
-      }
-      .no-print {
-        display: none !important;
-      }
-      .print-border {
-        border: 1px solid #94a3b8 !important;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoría de Higiene de Manos - OMS</title>
+    <!-- Tailwind CSS para diseño moderno y ultra-responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para iconos visuales intuitivos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Transiciones suaves para elementos interactivos */
+        .transition-all-custom {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @media print {
+            body {
+                background-color: white !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-border {
+                border: 1px solid #94a3b8 !important;
+            }
+        }
+    </style>
 </head>
-<body class="bg-slate-100 text-slate-800 flex flex-col min-h-screen font-sans antialiased">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
-  <!-- NOTIFICACIÓN -->
-  <div id="toast" class="fixed top-4 right-4 z-50 hidden shadow-2xl rounded-xl p-4 flex items-center space-x-3 text-white transition-all duration-300 transform border border-white/20">
-    <div id="toast-icon"></div>
-    <div>
-      <p class="font-bold text-sm">Notificación de Sistema</p>
-      <p id="toast-msg" class="text-xs opacity-95"></p>
-    </div>
-  </div>
-
-  <!-- ENCABEZADO DE IMPRESIÓN (OCULTO EN PANTALLA) -->
-  <div class="hidden print:block p-4 text-xs">
-    <div class="border border-slate-400 p-4 rounded-md">
-      <div class="text-center font-bold text-base border-b border-slate-400 pb-2 mb-2">
-        HOJA DE AUDITORÍA OMS - CUMPLIMIENTO DE HIGIENE DE MANOS
-      </div>
-      <div class="grid grid-cols-2 gap-2 mb-2">
-        <div><strong>Referencia:</strong> NTP-ISO 20658:2024 – Numeral 4.2 | Guía OMS "Los 5 Momentos"</div>
-        <div><strong>Establecimiento:</strong> <span id="print-area">Laboratorio Clínico</span></div>
-        <div><strong>Fecha:</strong> <span id="print-fecha"></span> | <strong>Turno:</strong> <span id="print-turno">Mañana</span></div>
-        <div><strong>Auditor / Observador:</strong> <span id="print-auditor"></span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ENCABEZADO PRINCIPAL (PANTALLA) -->
-  <header class="bg-gradient-to-r from-blue-700 via-indigo-800 to-indigo-900 text-white shadow-md no-print">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <div class="flex items-center space-x-3">
-            <span class="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
-              <i data-lucide="clipboard-check" class="text-cyan-300"></i>
-            </span>
-            <span class="bg-indigo-600 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full border border-indigo-400 uppercase tracking-wider">
-              NTP-ISO 20658:2024 (4.2)
-            </span>
-            <span id="cloud-status-badge" class="bg-amber-500/20 text-amber-300 text-xs font-semibold px-2.5 py-1 rounded-full border border-amber-500/40 flex items-center gap-1">
-              <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-              <span>Sin Enlazar</span>
-            </span>
-          </div>
-          <h1 class="text-2xl font-bold tracking-tight mt-1">
-            Auditoría Digital de Higiene de Manos <span class="text-cyan-300">OMS</span>
-          </h1>
-          <p class="text-indigo-200 text-xs sm:text-sm mt-1">
-            Herramienta interactiva para Laboratorios Clínicos y Banco de Sangre (Sincronizado en la Nube)
-          </p>
-        </div>
-        
-        <div class="flex flex-wrap gap-2">
-          <button onclick="cargarEjemploOficial()" class="bg-indigo-600/80 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-colors border border-indigo-400/40">
-            <i data-lucide="sparkles" class="text-amber-300 w-4 h-4"></i>
-            <span>Cargar Ejemplo Oficial</span>
-          </button>
-          
-          <button onclick="limpiarFormulario()" class="bg-slate-700/60 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-colors">
-            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-            <span>Limpiar</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- PESTAÑAS DE NAVEGACIÓN -->
-  <div class="bg-white border-b border-slate-200 no-print">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <nav class="-mb-px flex space-x-8">
-        <button onclick="cambiarPestana('auditoria')" id="tab-btn-auditoria" class="border-b-2 border-blue-600 py-4 px-1 text-sm font-semibold text-blue-600 flex items-center gap-2">
-          <i data-lucide="clipboard-check" class="w-4 h-4"></i> Formulario de Auditoría
-        </button>
-        <button onclick="cambiarPestana('historial')" id="tab-btn-historial" class="border-b-2 border-transparent py-4 px-1 text-sm font-semibold text-slate-500 hover:text-slate-700 flex items-center gap-2">
-          <i data-lucide="history" class="w-4 h-4"></i> Historial (Nube / Todos)
-        </button>
-        <button onclick="cambiarPestana('configuracion')" id="tab-btn-configuracion" class="border-b-2 border-transparent py-4 px-1 text-sm font-semibold text-slate-500 hover:text-slate-700 flex items-center gap-2">
-          <i data-lucide="settings" class="w-4 h-4"></i> Conexión Google Sheets
-        </button>
-        <button onclick="cambiarPestana('guia')" id="tab-btn-guia" class="border-b-2 border-transparent py-4 px-1 text-sm font-semibold text-slate-500 hover:text-slate-700 flex items-center gap-2">
-          <i data-lucide="help-circle" class="w-4 h-4"></i> Guía OMS
-        </button>
-      </nav>
-    </div>
-  </div>
-
-  <!-- SECCIÓN PRINCIPAL DE CONTENIDO -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-    
-    <!-- PESTAÑA 1: FORMULARIO ACTIVO -->
-    <div id="tab-auditoria" class="space-y-6">
-      
-      <!-- METADATOS -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-6 print:p-0 print:border-none print:shadow-none">
-        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 border-b border-slate-100 pb-3 no-print">
-          <i data-lucide="building" class="text-blue-600"></i> Datos Generales
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Fecha del Turno</label>
-            <input type="date" id="input-fecha" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none print:border-none print:p-0">
-          </div>
-          <div>
-            <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Turno Evaluado</label>
-            <div class="grid grid-cols-3 gap-1 bg-slate-50 p-1 rounded-lg border border-slate-200 no-print">
-              <button onclick="seleccionarTurno('Mañana')" id="btn-turno-manana" class="bg-blue-600 text-white text-xs font-semibold py-1.5 rounded-md shadow-sm">Mañana</button>
-              <button onclick="seleccionarTurno('Tarde')" id="btn-turno-tarde" class="text-slate-600 hover:bg-slate-200/50 text-xs font-semibold py-1.5 rounded-md">Tarde</button>
-              <button onclick="seleccionarTurno('Noche')" id="btn-turno-noche" class="text-slate-600 hover:bg-slate-200/50 text-xs font-semibold py-1.5 rounded-md">Noche</button>
+    <!-- Encabezado de la Aplicación -->
+    <header class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="bg-blue-500/30 text-blue-100 text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            Norma NTP-ISO 20658:2024 | Numeral 4.2
+                        </span>
+                        <span id="cloud-status-badge" class="bg-amber-500/20 text-amber-300 text-xs font-semibold px-2.5 py-1 rounded-full border border-amber-500/40 flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                            <span>Sin Enlazar a Google</span>
+                        </span>
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1.5">
+                        Hoja de Auditoría de Higiene de Manos (OMS)
+                    </h1>
+                    <p class="text-blue-100 text-xs sm:text-sm mt-1">
+                        Sincronización Virtual Colectiva - Laboratorio Clínico
+                    </p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="cargarDatosEjemplo()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-lg shadow transition-all-custom flex items-center gap-2">
+                        <i class="fa-solid fa-database"></i> Cargar Ejemplo
+                    </button>
+                    <button onclick="limpiarTodo()" class="bg-slate-700/50 hover:bg-red-600 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition-all-custom flex items-center gap-2">
+                        <i class="fa-solid fa-trash-can"></i> Limpiar Ficha
+                    </button>
+                </div>
             </div>
-          </div>
-          <div>
-            <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Área o Servicio</label>
-            <input type="text" id="input-area" placeholder="Ej. Bioquímica y Hematología" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none print:border-none print:p-0">
-          </div>
-          <div>
-            <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Auditor / Observador</label>
-            <input type="text" id="input-auditor" placeholder="Nombre de quien audita" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none print:border-none print:p-0">
-          </div>
         </div>
-      </div>
+    </header>
 
-      <!-- PANEL DE ENTRADA RÁPIDA (SOLO PANTALLA) -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 no-print">
-        <h3 class="text-md font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <i data-lucide="plus" class="text-blue-600 w-5 h-5"></i> Registrar Nueva Observación
-        </h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">Hora</label>
-            <input type="time" id="new-hora" class="w-full py-1.5 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">Categoría Profesional</label>
-            <select id="new-categoria" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-              <option value="Tecnólogo médico">Tecnólogo médico</option>
-              <option value="Técnico de laboratorio">Técnico de laboratorio</option>
-              <option value="Médico patólogo">Médico patólogo</option>
-              <option value="Administrativo">Administrativo</option>
-              <option value="Auxiliar de servicios">Auxiliar de servicios</option>
-              <option value="Otro personal">Otro personal</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">Momento OMS</label>
-            <div class="flex gap-1 bg-slate-50 p-1 border border-slate-200 rounded-lg" id="new-momento-container">
-              <!-- Botones del 1 al 5 se generan con JS -->
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">Acción Realizada</label>
-            <div class="grid grid-cols-3 gap-0.5 bg-slate-50 p-0.5 border border-slate-200 rounded-lg" id="new-accion-container">
-              <!-- Botones Friccion, Lavado, Ninguna -->
-            </div>
-          </div>
-          <div>
-            <button onclick="agregarFilaRapida()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-4 py-2 rounded-lg text-sm shadow-md hover:shadow-lg flex items-center justify-center gap-2 transition-all">
-              <i data-lucide="plus" class="w-4 h-4"></i> Agregar Fila
-            </button>
-          </div>
+    <!-- Pestañas de Navegación del Sistema (Nube integrada) -->
+    <div class="bg-white border-b border-slate-200 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="-mb-px flex space-x-6 overflow-x-auto no-scrollbar">
+                <button onclick="cambiarPestana('auditoria')" id="tab-btn-auditoria" class="border-b-2 border-blue-600 py-4 px-1 text-sm font-bold text-blue-600 flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-clipboard-list"></i> Formulario de Auditoría
+                </button>
+                <button onclick="cambiarPestana('historial')" id="tab-btn-historial" class="border-b-2 border-transparent py-4 px-1 text-sm font-semibold text-slate-500 hover:text-slate-700 flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> Historial Consolidado (Nube)
+                </button>
+                <button onclick="cambiarPestana('configuracion')" id="tab-btn-configuracion" class="border-b-2 border-transparent py-4 px-1 text-sm font-semibold text-slate-500 hover:text-slate-700 flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-gears"></i> Conexión Google Sheets
+                </button>
+                <button onclick="cambiarPestana('guia')" id="tab-btn-guia" class="border-b-2 border-transparent py-4 px-1 text-sm font-semibold text-slate-500 hover:text-slate-700 flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-book-medical"></i> Guía OMS
+                </button>
+            </nav>
         </div>
-      </div>
-
-      <!-- TABLA DE OBSERVACIONES -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden print:shadow-none print:border-none">
-        <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 no-print">
-          <div>
-            <h3 class="font-bold text-slate-800 flex items-center gap-1.5">
-              <span>Registro de Observaciones</span>
-              <span id="counter-observaciones" class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full font-bold">0 Registradas</span>
-            </h3>
-          </div>
-          <button onclick="agregarCincoFilasVacias()" class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs px-3 py-1.5 rounded-lg font-medium flex items-center gap-1">
-            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Lote +5 filas vacías
-          </button>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full min-w-[900px] border-collapse text-left text-sm text-slate-600">
-            <thead class="bg-slate-100 print:bg-slate-200 text-xs text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
-              <tr>
-                <th class="py-3 px-3 text-center w-12">N°</th>
-                <th class="py-3 px-3 w-24">Hora</th>
-                <th class="py-3 px-4 w-52">Categoría profesional</th>
-                <th class="py-3 px-4 text-center w-48">Momento (1 a 5)</th>
-                <th class="py-3 px-4 text-center w-64">Acción Realizada</th>
-                <th class="py-3 px-3 text-center w-24">¿Cumple?</th>
-                <th class="py-3 px-4">Observaciones / Detalles</th>
-                <th class="py-3 px-3 text-center w-16 no-print">Acción</th>
-              </tr>
-            </thead>
-            <tbody id="table-body" class="divide-y divide-slate-200">
-              <!-- Inyectado por JS -->
-            </tbody>
-          </table>
-        </div>
-
-        <!-- PIE DE RESULTADOS -->
-        <div class="bg-slate-50 p-5 border-t border-slate-200 grid grid-cols-1 md:grid-cols-4 gap-4 text-center print:p-4">
-          <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-            <div class="text-xs font-bold text-slate-400 uppercase">Oportunidades Observadas</div>
-            <div id="metric-total" class="text-2xl font-extrabold text-slate-800">0</div>
-          </div>
-          <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-            <div class="text-xs font-bold text-slate-400 uppercase">Acciones Cumplidas</div>
-            <div id="metric-cumplidas" class="text-2xl font-extrabold text-slate-800">0</div>
-          </div>
-          <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-            <div class="text-xs font-bold text-slate-400 uppercase">% Cumplimiento</div>
-            <div id="metric-porcentaje" class="text-2xl font-black text-rose-600">0 %</div>
-          </div>
-          <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
-            <div class="text-[10px] font-bold text-slate-400 uppercase">Meta Institucional</div>
-            <div class="text-sm font-bold text-slate-700">≥ 80 %</div>
-            <div class="mt-1" id="metric-meta-badge">
-              <span class="bg-rose-100 text-rose-800 text-xs px-2.5 py-0.5 rounded-full font-bold">BAJO LA META</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SECCIÓN DE FIRMAS -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 print:border-none print:shadow-none">
-        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider text-center border-b border-slate-100 pb-3 mb-6">
-          Validación de Auditoría y Control de Calidad
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <div class="flex flex-col items-center">
-            <input type="text" id="input-firma-auditor" placeholder="Firma / Nombre del auditor" class="w-full max-w-xs bg-slate-50 border border-slate-200 rounded px-3 py-1.5 text-center text-sm font-medium outline-none focus:ring-1 focus:ring-blue-500 print:border-none print:bg-transparent">
-            <span class="text-xs font-bold uppercase text-slate-400 mt-2">Firma del Auditor / Observador</span>
-          </div>
-          <div class="flex flex-col items-center">
-            <input type="text" id="input-firma-supervisor" placeholder="Firma / Nombre del supervisor" class="w-full max-w-xs bg-slate-50 border border-slate-200 rounded px-3 py-1.5 text-center text-sm font-medium outline-none focus:ring-1 focus:ring-blue-500 print:border-none print:bg-transparent">
-            <span class="text-xs font-bold uppercase text-slate-400 mt-2">Firma de Supervisor / Jefe de Área</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- BARRA DE ACCIÓN FINAL -->
-      <div class="flex flex-wrap items-center justify-between gap-4 p-4 bg-slate-800 rounded-2xl text-white shadow-lg no-print">
-        <div class="flex items-center space-x-2">
-          <i id="save-status-icon" data-lucide="alert-triangle" class="text-amber-400"></i>
-          <p id="save-status-text" class="text-xs text-slate-300">Presiona "Guardar Turno" para subir este reporte de manera virtual a la base de datos.</p>
-        </div>
-        <div class="flex gap-2">
-          <button onclick="guardarTurnoActual()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-md">
-            <i data-lucide="save" class="w-4 h-4"></i> Guardar Turno
-          </button>
-          <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-md">
-            <i data-lucide="printer" class="w-4 h-4"></i> Imprimir PDF
-          </button>
-        </div>
-      </div>
-
     </div>
 
-    <!-- PESTAÑA 2: HISTORIAL -->
-    <div id="tab-historial" class="space-y-6 hidden">
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-4 mb-4 gap-3">
-          <div>
-            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <i data-lucide="history" class="text-blue-600"></i> Historial Consolidado (Todos los Celulares)
-            </h2>
-            <p class="text-xs text-slate-500">Muestra los registros consolidados de tu Google Sheets (o los guardados localmente si no hay conexión).</p>
-          </div>
-          <button onclick="obtenerHistorialNube()" class="bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 text-xs px-3 py-1.5 rounded-lg font-bold flex items-center gap-1">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar Historial
-          </button>
+    <!-- ENCABEZADO DE IMPRESIÓN (OCULTO EN PANTALLA) -->
+    <div class="hidden print:block p-4 text-xs font-sans">
+        <div class="border border-slate-400 p-4 rounded-md">
+            <div class="text-center font-bold text-base border-b border-slate-400 pb-2 mb-2">
+                HOJA DE AUDITORÍA OMS - CUMPLIMIENTO DE HIGIENE DE MANOS
+            </div>
+            <div class="grid grid-cols-2 gap-2 mb-2">
+                <div><strong>Referencia:</strong> NTP-ISO 20658:2024 – Numeral 4.2 | Guía OMS "Los 5 Momentos"</div>
+                <div><strong>Establecimiento / Área:</strong> <span id="print-area">Laboratorio Clínico</span></div>
+                <div><strong>Fecha:</strong> <span id="print-fecha"></span> | <strong>Turno:</strong> <span id="print-turno">Mañana</span></div>
+                <div><strong>Nombre de Personal:</strong> <span id="print-auditor"></span></div>
+            </div>
         </div>
-        <div id="historial-container" class="space-y-3 mt-4">
-          <!-- Tarjetas del historial se inyectan aquí -->
-        </div>
-      </div>
     </div>
 
-    <!-- PESTAÑA 3: CONFIGURACIÓN DE CONEXIÓN -->
-    <div id="tab-configuracion" class="space-y-6 hidden">
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <h2 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2">
-          <i data-lucide="settings" class="text-indigo-600"></i> Configuración de la Nube (Google Sheets)
-        </h2>
-        <p class="text-xs text-slate-500 mb-6">Vincula esta página con tu hoja de cálculo para sincronizar la información de todo tu equipo.</p>
-        
-        <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mb-6">
-          <h4 class="text-xs font-bold text-indigo-800 uppercase mb-2 flex items-center gap-1.5">
-            <i data-lucide="info" class="w-4 h-4"></i> Instrucción de enlace
-          </h4>
-          <ol class="list-decimal list-inside text-xs text-indigo-950 space-y-1">
-            <li>Pega abajo la <strong>URL de la aplicación web</strong> que copiaste de Google Apps Script.</li>
-            <li>Presiona el botón "Guardar Enlace".</li>
-            <li>¡Listo! El indicador del menú de arriba pasará de "Sin Enlazar" a un check verde "Conectado". Cualquier reporte que guardes se irá directo a tu Excel de Google.</li>
-          </ol>
+    <!-- Contenido Principal -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6">
+
+        <!-- Mensaje de Notificación Custom (Reemplazo de alert) -->
+        <div id="toast" class="hidden fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 max-w-md animate-bounce">
+            <span id="toast-icon" class="text-emerald-400 text-lg"><i class="fa-solid fa-circle-check"></i></span>
+            <p id="toast-text" class="text-sm font-medium"></p>
         </div>
 
-        <div class="space-y-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">URL del Apps Script de Google</label>
-            <input type="text" id="url-script" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none">
-          </div>
-          <div>
-            <button onclick="guardarUrlScript()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-lg text-sm flex items-center gap-2 transition-colors">
-              <i data-lucide="link" class="w-4 h-4"></i> Guardar Enlace
-            </button>
-          </div>
+        <!-- ========================================== -->
+        <!-- PESTAÑA 1: FORMULARIO DE AUDITORÍA ACTIVA  -->
+        <!-- ========================================== -->
+        <div id="tab-auditoria" class="space-y-6">
+            <!-- SECCIÓN 1: Datos Generales de la Auditoría -->
+            <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 transition-all-custom">
+                <div class="border-b border-slate-100 pb-4 mb-4 flex items-center gap-2.5 text-blue-800 font-bold text-lg">
+                    <i class="fa-solid fa-file-signature text-xl"></i>
+                    <h2>Datos de Identificación del Turno</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Fecha -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Fecha de Evaluación</label>
+                        <input type="date" id="aud-fecha" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all-custom text-slate-700 font-medium">
+                    </div>
+
+                    <!-- Turno Evaluado -->
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Turno Evaluado</label>
+                        <div class="grid grid-cols-3 gap-2" id="turno-container">
+                            <button type="button" onclick="seleccionarTurno('Mañana')" id="btn-turno-manana" class="btn-turno py-2.5 px-3 rounded-xl border text-sm font-medium transition-all-custom flex items-center justify-center gap-2 bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100">
+                                <i class="fa-solid fa-sun text-amber-500"></i> Mañana
+                            </button>
+                            <button type="button" onclick="seleccionarTurno('Tarde')" id="btn-turno-tarde" class="btn-turno py-2.5 px-3 rounded-xl border text-sm font-medium transition-all-custom flex items-center justify-center gap-2 bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100">
+                                <i class="fa-solid fa-cloud-sun text-orange-400"></i> Tarde
+                            </button>
+                            <button type="button" onclick="seleccionarTurno('Noche')" id="btn-turno-noche" class="btn-turno py-2.5 px-3 rounded-xl border text-sm font-medium transition-all-custom flex items-center justify-center gap-2 bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100">
+                                <i class="fa-solid fa-moon text-indigo-400"></i> Noche
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Área o Servicio -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Área / Servicio</label>
+                        <input type="text" id="aud-area" placeholder="Ej. Área de Hematología" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all-custom text-slate-700">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <!-- Nombre de Personal -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Nombre de Personal</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 pointer-events-none">
+                                <i class="fa-solid fa-user-doctor"></i>
+                            </span>
+                            <input type="text" id="aud-auditor" placeholder="Nombre del personal observado" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all-custom text-slate-700 font-medium">
+                        </div>
+                    </div>
+
+                    <!-- Supervisor -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Supervisor de Calidad / Jefe de Área</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 pointer-events-none">
+                                <i class="fa-solid fa-user-shield"></i>
+                            </span>
+                            <input type="text" id="aud-supervisor" placeholder="Supervisor" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all-custom text-slate-700">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 2: Panel de Formulario Rápido e Interactivo -->
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
+                
+                <!-- Panel Izquierdo: Selección Rápida del Momento y Acción -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="border-b border-slate-100 pb-4 mb-4 flex items-center justify-between text-blue-800 font-bold text-lg">
+                            <span class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-circle-plus text-xl"></i>
+                                <h2>Registro Rápido de Observación</h2>
+                            </span>
+                            <span class="bg-blue-100 text-blue-700 text-xs px-2.5 py-1 rounded-full font-medium" id="quick-counter">
+                                Obs. N° 1
+                            </span>
+                        </div>
+
+                        <!-- Campos del Formulario Rápido -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+                            <!-- Hora -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Hora de Observación</label>
+                                <div class="flex gap-2">
+                                    <input type="time" id="obs-hora" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button type="button" onclick="setActualTime()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2.5 rounded-xl border border-slate-200 transition-all-custom text-xs font-semibold flex items-center justify-center gap-1 shrink-0">
+                                        <i class="fa-solid fa-clock-rotate-left"></i> Ahora
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Categoría Profesional -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Categoría Profesional</label>
+                                <select id="obs-categoria" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="Tecnólogo médico" selected>Tecnólogo médico</option>
+                                    <option value="Técnico de laboratorio">Técnico de laboratorio</option>
+                                    <option value="Médico patólogo">Médico patólogo</option>
+                                    <option value="Enfermero/a">Enfermero/a</option>
+                                    <option value="Administrativo">Administrativo</option>
+                                    <option value="Personal de limpieza / Apoyo">Personal de limpieza / Apoyo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- MOMENTOS OMS (1 AL 5) -->
+                        <div class="mb-5">
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex justify-between items-center">
+                                <span>Selecciona el Momento OMS</span>
+                                <span class="text-xs text-blue-600 font-medium cursor-pointer hover:underline" onclick="toggleHelpModal()">
+                                    <i class="fa-solid fa-circle-question"></i> Ver Guía OMS
+                                </span>
+                            </label>
+                            
+                            <div class="grid grid-cols-5 gap-2" id="momentos-grid">
+                                <button type="button" onclick="selectTempMomento(1)" id="btn-mom-1" class="mom-btn flex flex-col items-center justify-center py-3 px-1 rounded-xl border-2 transition-all-custom font-bold group bg-slate-50 border-slate-200/70 text-slate-600 hover:border-slate-300">
+                                    <span class="text-2xl sm:text-3xl block">1</span>
+                                    <span class="text-[9px] uppercase tracking-tighter text-slate-400 group-hover:text-slate-500">Antes</span>
+                                </button>
+                                <button type="button" onclick="selectTempMomento(2)" id="btn-mom-2" class="mom-btn flex flex-col items-center justify-center py-3 px-1 rounded-xl border-2 transition-all-custom font-bold group bg-slate-50 border-slate-200/70 text-slate-600 hover:border-slate-300">
+                                    <span class="text-2xl sm:text-3xl block">2</span>
+                                    <span class="text-[9px] uppercase tracking-tighter text-slate-400 group-hover:text-slate-500">Aséptico</span>
+                                </button>
+                                <button type="button" onclick="selectTempMomento(3)" id="btn-mom-3" class="mom-btn flex flex-col items-center justify-center py-3 px-1 rounded-xl border-2 transition-all-custom font-bold group bg-slate-50 border-slate-200/70 text-slate-600 hover:border-slate-300">
+                                    <span class="text-2xl sm:text-3xl block">3</span>
+                                    <span class="text-[9px] uppercase tracking-tighter text-slate-400 group-hover:text-slate-500">Fluidos</span>
+                                </button>
+                                <button type="button" onclick="selectTempMomento(4)" id="btn-mom-4" class="mom-btn flex flex-col items-center justify-center py-3 px-1 rounded-xl border-2 transition-all-custom font-bold group bg-slate-50 border-slate-200/70 text-slate-600 hover:border-slate-300">
+                                    <span class="text-2xl sm:text-3xl block">4</span>
+                                    <span class="text-[9px] uppercase tracking-tighter text-slate-400 group-hover:text-slate-500">Después</span>
+                                </button>
+                                <button type="button" onclick="selectTempMomento(5)" id="btn-mom-5" class="mom-btn flex flex-col items-center justify-center py-3 px-1 rounded-xl border-2 transition-all-custom font-bold group bg-slate-50 border-slate-200/70 text-slate-600 hover:border-slate-300">
+                                    <span class="text-2xl sm:text-3xl block">5</span>
+                                    <span class="text-[9px] uppercase tracking-tighter text-slate-400 group-hover:text-slate-500">Entorno</span>
+                                </button>
+                            </div>
+
+                            <div class="mt-3 bg-blue-50/50 border border-blue-100 rounded-xl px-3.5 py-2.5 text-xs text-blue-800 leading-relaxed min-h-[46px] flex items-center gap-2" id="mom-desc-container">
+                                <i class="fa-solid fa-circle-info text-blue-500 text-sm shrink-0"></i>
+                                <span id="mom-desc-text" class="font-medium">Selecciona un momento para ver su descripción oficial.</span>
+                            </div>
+                        </div>
+
+                        <!-- ACCIÓN REALIZADA -->
+                        <div class="mb-5">
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Acción Realizada</label>
+                            <div class="grid grid-cols-3 gap-2.5" id="acciones-grid">
+                                <button type="button" onclick="selectTempAccion('Fricción')" id="btn-acc-friccion" class="acc-btn py-3 px-2 rounded-xl border-2 text-sm font-bold transition-all-custom flex flex-col sm:flex-row items-center justify-center gap-2 bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100">
+                                    <i class="fa-solid fa-hands-bubbles text-emerald-500 text-lg"></i>
+                                    <span>Fricción</span>
+                                </button>
+                                <button type="button" onclick="selectTempAccion('Lavado')" id="btn-acc-lavado" class="acc-btn py-3 px-2 rounded-xl border-2 text-sm font-bold transition-all-custom flex flex-col sm:flex-row items-center justify-center gap-2 bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100">
+                                    <i class="fa-solid fa-soap text-cyan-500 text-lg"></i>
+                                    <span>Lavado</span>
+                                </button>
+                                <button type="button" onclick="selectTempAccion('Ninguna')" id="btn-acc-ninguna" class="acc-btn py-3 px-2 rounded-xl border-2 text-sm font-bold transition-all-custom flex flex-col sm:flex-row items-center justify-center gap-2 bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100">
+                                    <i class="fa-solid fa-triangle-exclamation text-rose-500 text-lg"></i>
+                                    <span>Ninguna</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Observaciones de la fila -->
+                        <div class="mb-5">
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Comentarios / Observaciones (Opcional)</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-regular fa-comment-dots"></i>
+                                </span>
+                                <input type="text" id="obs-comentario" placeholder="Dejar vacío para comentario automático..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botón de Envío: AGREGAR FILA -->
+                    <button type="button" onclick="agregarFilaRapida()" id="btn-agregar-fila" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg hover:shadow-indigo-500/25 transition-all-custom flex items-center justify-center gap-2.5 text-base mt-2">
+                        <i class="fa-solid fa-plus-circle text-lg"></i>
+                        <span>Agregar Observación a la Tabla</span>
+                    </button>
+                </div>
+
+                <!-- Panel Derecho: Resumen Ejecutivo e Indicador de Cumplimiento -->
+                <div class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl shadow-xl p-5 sm:p-6 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold uppercase tracking-wider text-indigo-300 border-b border-indigo-900/50 pb-3 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie"></i> Resultados del Turno
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <!-- KPI 1 -->
+                            <div class="bg-indigo-950/40 rounded-xl p-4 border border-indigo-900/30 flex justify-between items-center">
+                                <div>
+                                    <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Total Oportunidades</p>
+                                    <p class="text-xs text-indigo-300 mt-0.5">Mínimo 5 por turno</p>
+                                </div>
+                                <span id="kpi-total" class="text-3xl font-extrabold text-white">0</span>
+                            </div>
+
+                            <!-- KPI 2 -->
+                            <div class="bg-indigo-950/40 rounded-xl p-4 border border-indigo-900/30 flex justify-between items-center">
+                                <div>
+                                    <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Acciones Cumplidas</p>
+                                    <p class="text-xs text-emerald-400 mt-0.5">Fricción + Lavado</p>
+                                </div>
+                                <span id="kpi-cumplidas" class="text-3xl font-extrabold text-emerald-400">0</span>
+                            </div>
+
+                            <!-- KPI 3 -->
+                            <div class="bg-indigo-950/40 rounded-xl p-4 border border-indigo-900/30 text-center">
+                                <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Porcentaje de Cumplimiento</p>
+                                <div class="inline-flex items-baseline gap-1.5">
+                                    <span id="kpi-porcentaje" class="text-5xl font-black text-amber-300">0%</span>
+                                </div>
+                                <div class="w-full bg-slate-800 rounded-full h-3.5 mt-4 overflow-hidden p-0.5 border border-indigo-950">
+                                    <div id="kpi-progress" class="bg-gradient-to-r from-amber-400 to-emerald-500 h-full rounded-full transition-all-custom" style="width: 0%"></div>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px] text-slate-400 mt-1.5 font-medium">
+                                    <span>0%</span>
+                                    <span class="text-slate-200">Meta: 80%</span>
+                                    <span>100%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-indigo-900/50 text-center">
+                        <span id="status-badge" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase bg-slate-800 text-slate-300 border border-slate-700">
+                            <i class="fa-solid fa-circle-exclamation"></i> Sin datos suficientes
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 3: Tabla de Observaciones Registradas -->
+            <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 transition-all-custom">
+                <div class="border-b border-slate-100 pb-4 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div class="flex items-center gap-2.5 text-blue-800 font-bold text-lg">
+                        <i class="fa-solid fa-list-check text-xl"></i>
+                        <h2>Registro de Observaciones Registradas</h2>
+                    </div>
+                    <div class="flex items-center gap-2 self-start sm:self-auto no-print">
+                        <button onclick="exportarCSV()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all-custom">
+                            <i class="fa-solid fa-file-excel"></i> Exportar CSV (Excel)
+                        </button>
+                        <button onclick="window.print()" class="bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all-custom">
+                            <i class="fa-solid fa-print"></i> Imprimir / PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla Responsiva -->
+                <div class="overflow-x-auto border border-slate-150 rounded-xl">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-wider border-b border-slate-150">
+                                <th class="py-3 px-4 text-center w-12">N°</th>
+                                <th class="py-3 px-4 w-20">Hora</th>
+                                <th class="py-3 px-4 w-44">Categoría Profesional</th>
+                                <th class="py-3 px-4 text-center w-24">Momento OMS</th>
+                                <th class="py-3 px-4 w-36">Acción Realizada</th>
+                                <th class="py-3 px-4 text-center w-24">¿Cumple?</th>
+                                <th class="py-3 px-4">Observaciones / Comentario</th>
+                                <th class="py-3 px-4 text-center w-16 no-print">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-tbody" class="divide-y divide-slate-100 text-sm font-medium text-slate-700">
+                            <tr id="empty-row" class="text-slate-400 text-center">
+                                <td colspan="8" class="py-10">
+                                    <div class="flex flex-col items-center justify-center gap-2">
+                                        <i class="fa-solid fa-inbox text-4xl text-slate-300"></i>
+                                        <p class="font-semibold">No se han registrado observaciones aún.</p>
+                                        <p class="text-xs text-slate-400">Selecciona el momento y la acción arriba para agregar filas.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mt-4 text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
+                    <div class="flex gap-4">
+                        <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-emerald-500"></i> Cumple = Fricción o Lavado</span>
+                        <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500"></i> No Cumple = Ninguna</span>
+                    </div>
+                    <span>Requisito Mínimo: 5 Observaciones por Turno</span>
+                </div>
+            </section>
+
+            <!-- Firmas Estilo Ficha Formato Físico (Solo firma del supervisor, centrado y por defecto) -->
+            <section class="flex justify-center bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 text-sm text-slate-600 mt-6 print:mt-16">
+                <div class="flex flex-col items-center justify-end h-32 border border-dashed border-slate-200 rounded-xl p-4 w-full md:w-1/2">
+                    <div class="text-slate-800 font-bold mb-1" id="firma-nombre-supervisor">Dr. LUIS GUILLERMO JURADO CRISPIN</div>
+                    <div class="w-2/3 border-t border-slate-300 text-center pt-2 font-bold text-xs text-slate-500 uppercase tracking-wider">
+                        Firma del Supervisor de Calidad
+                    </div>
+                </div>
+            </section>
+
+            <!-- BARRA DE ACCIÓN FINAL (GUARDADO EN LA NUBE) -->
+            <div class="flex flex-wrap items-center justify-between gap-4 p-4 bg-slate-800 rounded-2xl text-white shadow-lg no-print">
+                <div class="flex items-center space-x-2">
+                    <i id="save-status-icon" class="fa-solid fa-cloud-arrow-up text-amber-400"></i>
+                    <p id="save-status-text" class="text-xs text-slate-300">Presiona "Guardar Turno" para subir este reporte de manera virtual a la base de datos de Google Sheets.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="guardarTurnoActual()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-md transition-all-custom">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Guardar Turno (Nube)
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <!-- ========================================== -->
+        <!-- PESTAÑA 2: HISTORIAL DE REGISTROS DIARIOS  -->
+        <!-- ========================================== -->
+        <div id="tab-historial" class="space-y-6 hidden no-print">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-4 mb-4 gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-clock-history text-indigo-600"></i> Historial Consolidado (Todos los Celulares)
+                        </h2>
+                        <p class="text-xs text-slate-500">Muestra los registros consolidados cargados directamente de tu Google Sheets.</p>
+                    </div>
+                    <button onclick="obtenerHistorialNube()" class="bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 text-xs font-bold px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition-all-custom">
+                        <i class="fa-solid fa-arrows-rotate animate-pulse"></i> Actualizar de la Nube
+                    </button>
+                </div>
+                <div id="historial-container" class="space-y-3 mt-4">
+                    <!-- Registros inyectados por JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PESTAÑA 3: CONFIGURACIÓN DE CONEXIÓN       -->
+        <!-- ========================================== -->
+        <div id="tab-configuracion" class="space-y-6 hidden no-print">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <h2 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-gears text-indigo-600"></i> Configuración de la Nube (Google Sheets)
+                </h2>
+                <p class="text-xs text-slate-500 mb-6">Vincula esta página con tu hoja de cálculo para sincronizar la información de todo tu equipo.</p>
+                
+                <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mb-6">
+                    <h4 class="text-xs font-bold text-indigo-800 uppercase mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-info"></i> Instrucción de enlace
+                    </h4>
+                    <ol class="list-decimal list-inside text-xs text-indigo-950 space-y-1">
+                        <li>Pega abajo la <strong>URL de la aplicación web</strong> que copiaste de Google Apps Script.</li>
+                        <li>Presiona el botón "Guardar Enlace".</li>
+                        <li>¡Listo! El indicador pasará a check verde "Conectado". Cualquier reporte que guardes se irá directo a tu Excel de Google de forma virtual.</li>
+                    </ol>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">URL del Apps Script de Google</label>
+                        <input type="text" id="url-script" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none">
+                    </div>
+                    <div>
+                        <button onclick="guardarUrlScript()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 transition-colors">
+                            <i class="fa-solid fa-link"></i> Guardar Enlace
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PESTAÑA 4: GUIA OMS                       -->
+        <!-- ========================================== -->
+        <div id="tab-guia" class="space-y-6 hidden no-print">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-hands-clean text-blue-600"></i> Los 5 Momentos de Higiene de Manos OMS
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <span class="bg-blue-600 text-white font-bold px-2 py-1 text-xs rounded">Momento 1</span>
+                        <p class="text-xs font-bold mt-2 text-slate-700">Antes del contacto directo con el paciente / muestra.</p>
+                    </div>
+                    <div class="bg-cyan-50 p-4 rounded-xl border border-cyan-100">
+                        <span class="bg-cyan-600 text-white font-bold px-2 py-1 text-xs rounded">Momento 2</span>
+                        <p class="text-xs font-bold mt-2 text-slate-700">Antes de realizar un procedimiento limpio o aséptico.</p>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
+                        <span class="bg-amber-600 text-white font-bold px-2 py-1 text-xs rounded">Momento 3</span>
+                        <p class="text-xs font-bold mt-2 text-slate-700">Después del riesgo de exposición a fluidos corporales.</p>
+                    </div>
+                    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                        <span class="bg-indigo-600 text-white font-bold px-2 py-1 text-xs rounded">Momento 4</span>
+                        <p class="text-xs font-bold mt-2 text-slate-700">Después del contacto con el paciente o muestra.</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                        <span class="bg-purple-600 text-white font-bold px-2 py-1 text-xs rounded">Momento 5</span>
+                        <p class="text-xs font-bold mt-2 text-slate-700">Después del contacto con el entorno del área de trabajo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Pie de Página -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-5 border-t border-slate-850 mt-12 print:hidden">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-1">
+            <p>© 2026 Sistema Integral de Control de Infecciones Intrahospitalarias - Laboratorio Clínico.</p>
+            <p class="text-[10px] text-slate-500">Diseñado conforme a la Guía Técnica de la Organización Mundial de la Salud (OMS) para la Evaluación del Lavado de Manos.</p>
+        </div>
+    </footer>
+
+    <!-- Modal de Guía OMS de los 5 Momentos -->
+    <div id="guide-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden animate-fade-in">
+            <div class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center font-bold">
+                <h3><i class="fa-solid fa-hands-clean"></i> Guía Oficial: Los 5 Momentos de la OMS</h3>
+                <button onclick="toggleHelpModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-sm leading-relaxed">
+                <!-- Los 5 puntos de la guía -->
+                <div class="space-y-3" id="guide-points"></div>
+            </div>
+            <div class="bg-slate-50 px-6 py-3 text-right">
+                <button onclick="toggleHelpModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-xs">Entendido</button>
+            </div>
+        </div>
     </div>
 
-    <!-- PESTAÑA 4: GUIA OMS -->
-    <div id="tab-guia" class="space-y-6 hidden">
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <i data-lucide="help-circle" class="text-blue-600"></i> Los 5 Momentos de Higiene de Manos OMS
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-            <span class="bg-blue-600 text-white font-bold px-2 py-1 text-xs rounded">Momento 1</span>
-            <p class="text-xs font-bold mt-2 text-slate-700">Antes del contacto con el paciente o muestra.</p>
-          </div>
-          <div class="bg-cyan-50 p-4 rounded-xl border border-cyan-100">
-            <span class="bg-cyan-600 text-white font-bold px-2 py-1 text-xs rounded">Momento 2</span>
-            <p class="text-xs font-bold mt-2 text-slate-700">Antes de realizar un procedimiento limpio o aséptico.</p>
-          </div>
-          <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
-            <span class="bg-amber-600 text-white font-bold px-2 py-1 text-xs rounded">Momento 3</span>
-            <p class="text-xs font-bold mt-2 text-slate-700">Después del riesgo de exposición a fluidos corporales.</p>
-          </div>
-          <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
-            <span class="bg-indigo-600 text-white font-bold px-2 py-1 text-xs rounded">Momento 4</span>
-            <p class="text-xs font-bold mt-2 text-slate-700">Después del contacto con el paciente o muestra.</p>
-          </div>
-          <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
-            <span class="bg-purple-600 text-white font-bold px-2 py-1 text-xs rounded">Momento 5</span>
-            <p class="text-xs font-bold mt-2 text-slate-700">Después del contacto con el entorno del área de trabajo.</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- LÓGICA JAVASCRIPT CON MOTOR DE ESTADOS INTEGRAL Y NUBE -->
+    <script>
+        const descripcionesMomentos = {
+            1: "MOMENTO 1: Antes del contacto con el paciente o con la muestra biológica.",
+            2: "MOMENTO 2: Antes de realizar un procedimiento limpio o aséptico de laboratorio.",
+            3: "MOMENTO 3: Después del riesgo de exposición a fluidos corporales o secreciones.",
+            4: "MOMENTO 4: Después del contacto con el paciente o la muestra de análisis.",
+            5: "MOMENTO 5: Después del contacto con el entorno de trabajo u objetos del paciente."
+        };
 
-  </main>
+        const comentariosSugeridos = {
+            1: {
+                "Fricción": "Aplicó alcohol gel de forma rápida antes de iniciar la toma de muestra.",
+                "Lavado": "Lavado completo con jabón antiséptico antes de interactuar con el paciente.",
+                "Ninguna": "OMISIÓN: Inició atención o registro de muestras sin higiene previa."
+            },
+            2: {
+                "Fricción": "Se desinfectó las manos antes de calibrar o preparar reactivos críticos.",
+                "Lavado": "Realizó lavado antes de procesar cultivos o pruebas asépticas.",
+                "Ninguna": "OMISIÓN: Realizó una tarea aséptica directa sin higienizar sus manos."
+            },
+            3: {
+                "Fricción": "Higiene con solución hidroalcohólica tras retirar guantes con fluidos.",
+                "Lavado": "Lavado vigoroso con agua y jabón tras salpicaduras y descarte de residuos.",
+                "Ninguna": "OMISIÓN: Retiro de guantes con fluidos biológicos sin higiene posterior."
+            },
+            4: {
+                "Fricción": "Higiene de manos tras despedir al paciente y rotular sus tubos.",
+                "Lavado": "Se lavó las manos después de recolectar muestras de secreciones.",
+                "Ninguna": "OMISIÓN: Salió del box de toma de muestras sin realizar higiene."
+            },
+            5: {
+                "Fricción": "Aplicación de alcohol gel luego de limpiar la centrífuga o pipeta.",
+                "Lavado": "Lavado clínico tras ordenar la mesa de trabajo del laboratorio.",
+                "Ninguna": "OMISIÓN: Manipuló teclados y mouse del analizador sin higiene final."
+            }
+        };
 
-  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 no-print">
-    <p>© Control de Calidad y Bioseguridad en Laboratorio Clínico.</p>
-  </footer>
+        // ESTADO GLOBAL DE LA APLICACIÓN (Inicia siempre con observaciones vacías)
+        let appState = {
+            fecha: new Date().toISOString().split('T')[0],
+            turno: "Mañana",
+            area: "Laboratorio Clínico",
+            auditor: "", // Vacío por defecto
+            supervisor: "Dr. LUIS GUILLERMO JURADO CRISPIN", // Supervisor predeterminado fijo
+            observaciones: [], // TABLA EN BLANCO AL INICIAR
+            seleccionMomento: 1,
+            seleccionAccion: "Fricción"
+        };
 
-  <!-- LÓGICA DE LA APLICACIÓN -->
-  <script>
-    // --- VARIABLES DEL ESTADO ---
-    let turno = 'Mañana';
-    let activeTab = 'auditoria';
-    let tempMomento = 1;
-    let tempAccion = 'Fricción';
-    
-    // URL del Google Apps Script
-    let googleScriptUrl = '';
+        let googleScriptUrl = "";
+        let historial = [];
 
-    // Observaciones activas
-    let observaciones = [
-      { id: 1, hora: '08:00', categoria: 'Tecnólogo médico', momento: 1, accion: 'Fricción', cumple: 'Sí', notes: 'Aplicó alcohol gel antes de toma de muestra.' },
-      { id: 2, hora: '08:30', categoria: 'Técnico de laboratorio', momento: 2, accion: 'Lavado', cumple: 'Sí', notes: 'Lavado completo antes de preparar material.' },
-      { id: 3, hora: '09:00', categoria: 'Tecnólogo médico', momento: 3, accion: 'Ninguna', cumple: 'No', notes: 'Omitió higiene tras retirar guantes con suero.' }
-    ];
+        window.onload = function() {
+            // Cargar enlace de nube guardado
+            const savedUrl = localStorage.getItem('google_script_url');
+            if (savedUrl) {
+                googleScriptUrl = savedUrl;
+                document.getElementById('url-script').value = googleScriptUrl;
+                actualizarIndicadorConexion(true);
+            } else {
+                actualizarIndicadorConexion(false);
+            }
 
-    // Historial global (descargado de la nube o copias locales)
-    let historial = [];
+            // Sincronizar campos de texto generales
+            document.getElementById('aud-fecha').value = appState.fecha;
+            document.getElementById('aud-area').value = appState.area;
+            document.getElementById('aud-auditor').value = appState.auditor;
+            document.getElementById('aud-supervisor').value = appState.supervisor;
 
-    const SUGERENCIAS = {
-      'Fricción': 'Aplicó alcohol gel de manera correcta.',
-      'Lavado': 'Lavado higiénico con agua y jabón.',
-      'Ninguna': 'Omitió higiene requerida.'
-    };
+            // Rellenar modal de guía automáticamente
+            const guideContainer = document.getElementById('guide-points');
+            guideContainer.innerHTML = Object.keys(descripcionesMomentos).map(k => `
+                <div class="flex gap-3 items-start p-2 hover:bg-slate-50 rounded-lg transition-colors">
+                    <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">${k}</span>
+                    <div>
+                        <strong class="text-slate-800">${descripcionesMomentos[k].split(':')[0]}:</strong>
+                        <p class="text-slate-500 text-xs mt-0.5">${descripcionesMomentos[k].split(':')[1]}</p>
+                    </div>
+                </div>
+            `).join('');
 
-    // --- CARGA INICIAL ---
-    window.onload = function() {
-      // Cargar dirección del script guardado
-      const savedUrl = localStorage.getItem('google_script_url');
-      if (savedUrl) {
-        googleScriptUrl = savedUrl;
-        document.getElementById('url-script').value = googleScriptUrl;
-        actualizarIndicadorConexion(true);
-      } else {
-        actualizarIndicadorConexion(false);
-      }
+            setActualTime();
+            seleccionarTurno(appState.turno);
+            selectTempMomento(appState.seleccionMomento);
+            selectTempAccion(appState.seleccionAccion);
 
-      // Cargar historial local por si acaso
-      const savedLocalHistorial = localStorage.getItem('local_historial_fallback');
-      if (savedLocalHistorial) {
-        historial = JSON.parse(savedLocalHistorial);
-      }
+            // Escuchar cambios de datos de cabecera
+            document.getElementById('aud-fecha').addEventListener('change', (e) => appState.fecha = e.target.value);
+            document.getElementById('aud-area').addEventListener('input', (e) => appState.area = e.target.value);
+            document.getElementById('aud-auditor').addEventListener('input', (e) => appState.auditor = e.target.value);
+            document.getElementById('aud-supervisor').addEventListener('input', (e) => {
+                appState.supervisor = e.target.value;
+                document.getElementById('firma-nombre-supervisor').innerText = e.target.value || "(Supervisor)";
+            });
 
-      // Establecer fecha por defecto (hoy)
-      document.getElementById('input-fecha').value = new Date().toISOString().split('T')[0];
-      
-      // Hora por defecto
-      const now = new Date();
-      document.getElementById('new-hora').value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      
-      generarControlesEntrada();
-      renderTabla();
-      lucide.createIcons();
-    }
+            renderizarTabla();
+            actualizarEstadisticas();
+        };
 
-    // --- TOAST NOTIFICATIONS ---
-    function showNotification(msg, type = 'success') {
-      const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toast-msg');
-      const toastIcon = document.getElementById('toast-icon');
-      
-      toastMsg.innerText = msg;
-      
-      if (type === 'success') {
-        toast.style.backgroundColor = '#10b981';
-        toastIcon.innerHTML = '<i data-lucide="check-circle"></i>';
-      } else if (type === 'warning') {
-        toast.style.backgroundColor = '#f59e0b';
-        toastIcon.innerHTML = '<i data-lucide="alert-triangle"></i>';
-      } else {
-        toast.style.backgroundColor = '#ef4444';
-        toastIcon.innerHTML = '<i data-lucide="x-circle"></i>';
-      }
-      
-      toast.classList.remove('hidden');
-      lucide.createIcons();
-      
-      setTimeout(() => {
-        toast.classList.add('hidden');
-      }, 3500);
-    }
-
-    // --- INDICADOR DE ESTADO EN EL MENÚ ---
-    function actualizarIndicadorConexion(conectado) {
-      const badge = document.getElementById('cloud-status-badge');
-      if (conectado) {
-        badge.className = "bg-emerald-600/20 text-emerald-300 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-500/40 flex items-center gap-1";
-        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> <span>Conectado a Google Sheets</span>`;
-      } else {
-        badge.className = "bg-amber-500/20 text-amber-300 text-xs font-semibold px-2.5 py-1 rounded-full border border-amber-500/40 flex items-center gap-1";
-        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> <span>Sin Enlazar a Google</span>`;
-      }
-    }
-
-    // --- CONFIGURACIÓN DE URL DE GOOGLE APPS SCRIPT ---
-    function guardarUrlScript() {
-      const url = document.getElementById('url-script').value.trim();
-      if (!url) {
-        showNotification('La URL no puede estar vacía.', 'error');
-        return;
-      }
-      googleScriptUrl = url;
-      localStorage.setItem('google_script_url', url);
-      actualizarIndicadorConexion(true);
-      showNotification('Enlace con la nube guardado con éxito.');
-      cambiarPestana('auditoria');
-    }
-
-    // --- CONTROLES DE ENTRADA RAPIDA ---
-    function generarControlesEntrada() {
-      const mContainer = document.getElementById('new-momento-container');
-      mContainer.innerHTML = '';
-      for (let i = 1; i <= 5; i++) {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.onclick = () => selectTempMomento(i);
-        btn.id = `new-m-${i}`;
-        btn.innerText = i;
-        btn.className = `flex-1 text-center font-bold text-xs py-1.5 rounded transition-all ${tempMomento === i ? 'bg-indigo-600 text-white shadow' : 'text-slate-600 hover:bg-slate-200'}`;
-        mContainer.appendChild(btn);
-      }
-
-      const aContainer = document.getElementById('new-accion-container');
-      aContainer.innerHTML = '';
-      ['Fricción', 'Lavado', 'Ninguna'].forEach(acc => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.onclick = () => selectTempAccion(acc);
-        btn.id = `new-a-${acc}`;
-        btn.innerText = acc;
-        btn.className = `text-[10px] font-bold py-1.5 rounded text-center transition-all ${tempAccion === acc ? (acc === 'Ninguna' ? 'bg-rose-600 text-white shadow' : 'bg-emerald-600 text-white shadow') : 'text-slate-600 hover:bg-slate-200'}`;
-        aContainer.appendChild(btn);
-      });
-    }
-
-    function selectTempMomento(num) {
-      tempMomento = num;
-      generarControlesEntrada();
-    }
-
-    function selectTempAccion(acc) {
-      tempAccion = acc;
-      generarControlesEntrada();
-    }
-
-    // --- ACCIONES DE TABLA ---
-    function renderTabla() {
-      const tbody = document.getElementById('table-body');
-      tbody.innerHTML = '';
-      
-      if (observaciones.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colSpan="8" class="text-center py-10 text-slate-400">
-              <p class="font-medium">No hay observaciones en el turno activo.</p>
-              <p class="text-xs">Carga el Ejemplo Oficial para comenzar o crea tus filas.</p>
-            </td>
-          </tr>
-        `;
-        actualizarMetricas();
-        return;
-      }
-
-      observaciones.forEach((obs, idx) => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50/70 transition-colors";
-        
-        const cumpleBadge = obs.cumple === 'Sí' 
-          ? `<button onclick="toggleCumple(${obs.id})" class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-bold border border-emerald-200 flex items-center mx-auto">Sí</button>`
-          : `<button onclick="toggleCumple(${obs.id})" class="bg-rose-100 text-rose-800 text-xs px-2.5 py-1 rounded-full font-bold border border-rose-200 flex items-center mx-auto">No</button>`;
-
-        tr.innerHTML = `
-          <td class="py-2 px-3 text-center font-bold text-slate-800 bg-slate-50">${idx + 1}</td>
-          <td class="py-2 px-3">
-            <input type="time" value="${obs.hora}" onchange="editarFila(${obs.id}, 'hora', this.value)" class="w-full bg-transparent border-b border-transparent focus:border-blue-500 text-sm font-semibold text-slate-800 outline-none p-1">
-          </td>
-          <td class="py-2 px-4">
-            <select onchange="editarFila(${obs.id}, 'categoria', this.value)" class="w-full bg-transparent border-b border-transparent focus:border-blue-500 text-sm outline-none py-1">
-              <option value="Tecnólogo médico" ${obs.categoria === 'Tecnólogo médico' ? 'selected' : ''}>Tecnólogo médico</option>
-              <option value="Técnico de laboratorio" ${obs.categoria === 'Técnico de laboratorio' ? 'selected' : ''}>Técnico de laboratorio</option>
-              <option value="Médico patólogo" ${obs.categoria === 'Médico patólogo' ? 'selected' : ''}>Médico patólogo</option>
-              <option value="Administrativo" ${obs.categoria === 'Administrativo' ? 'selected' : ''}>Administrativo</option>
-              <option value="Auxiliar de servicios" ${obs.categoria === 'Auxiliar de servicios' ? 'selected' : ''}>Auxiliar de servicios</option>
-              <option value="Otro personal" ${obs.categoria === 'Otro personal' ? 'selected' : ''}>Otro personal</option>
-            </select>
-          </td>
-          <td class="py-2 px-4 text-center">
-            <div class="flex justify-center space-x-1 no-print">
-              ${[1,2,3,4,5].map(n => `
-                <button onclick="editarFila(${obs.id}, 'momento', ${n})" class="w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center ${obs.momento === n ? 'bg-indigo-600 text-white' : 'bg-slate-100 hover:bg-slate-200'}">${n}</button>
-              `).join('')}
-            </div>
-            <span class="hidden print:inline font-bold">M${obs.momento}</span>
-          </td>
-          <td class="py-2 px-4">
-            <div class="flex justify-center bg-slate-50 p-0.5 rounded-lg border border-slate-200 no-print">
-              ${['Fricción', 'Lavado', 'Ninguna'].map(acc => `
-                <button onclick="cambiarAccionFila(${obs.id}, '${acc}')" class="flex-1 py-1 rounded text-xs font-semibold ${obs.accion === acc ? (acc === 'Ninguna' ? 'bg-rose-600 text-white shadow' : 'bg-emerald-600 text-white shadow') : 'text-slate-500 hover:bg-slate-100'}">${acc}</button>
-              `).join('')}
-            </div>
-            <span class="hidden print:inline font-semibold">${obs.accion}</span>
-          </td>
-          <td class="py-2 px-3 text-center">${cumpleBadge}</td>
-          <td class="py-2 px-4">
-            <input type="text" value="${obs.notes || ''}" onchange="editarFila(${obs.id}, 'notas', this.value)" placeholder="Observaciones..." class="w-full bg-transparent border-b border-transparent focus:border-blue-500 text-xs text-slate-700 outline-none py-1">
-          </td>
-          <td class="py-2 px-3 text-center no-print">
-            <button onclick="eliminarFila(${obs.id})" class="text-slate-300 hover:text-rose-600 p-1.5"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      actualizarMetricas();
-      lucide.createIcons();
-    }
-
-    function agregarFilaRapida() {
-      const hora = document.getElementById('new-hora').value;
-      const categoria = document.getElementById('new-categoria').value;
-      const cumple = tempAccion === 'Ninguna' ? 'No' : 'Sí';
-      const notas = SUGERENCIAS[tempAccion];
-
-      observaciones.push({
-        id: Date.now(),
-        hora,
-        categoria,
-        momento: tempMomento,
-        accion: tempAccion,
-        cumple,
-        notes: notas
-      });
-
-      renderTabla();
-      showNotification('Observación agregada exitosamente.');
-    }
-
-    function agregarCincoFilasVacias() {
-      const horaActual = document.getElementById('new-hora').value;
-      let [h, m] = horaActual.split(':').map(Number);
-
-      for (let i = 0; i < 5; i++) {
-        m += 10;
-        if (m >= 60) { h = (h + 1) % 24; m -= 60; }
-        const hString = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-        
-        observaciones.push({
-          id: Date.now() + i,
-          hora: hString,
-          categoria: 'Tecnólogo médico',
-          momento: 1,
-          accion: 'Fricción',
-          cumple: 'Sí',
-          notes: SUGERENCIAS['Fricción']
-        });
-      }
-      renderTabla();
-      showNotification('Se crearon 5 registros de muestra rápidos.');
-    }
-
-    function cambiarAccionFila(id, nuevaAccion) {
-      observaciones = observaciones.map(o => {
-        if (o.id === id) {
-          return {
-            ...o,
-            accion: nuevaAccion,
-            cumple: nuevaAccion === 'Ninguna' ? 'No' : 'Sí',
-            notes: SUGERENCIAS[nuevaAccion]
-          };
+        function setActualTime() {
+            const ahora = new Date();
+            const horas = String(ahora.getHours()).padStart(2, '0');
+            const minutos = String(ahora.getMinutes()).padStart(2, '0');
+            document.getElementById('obs-hora').value = `${horas}:${minutos}`;
         }
-        return o;
-      });
-      renderTabla();
-    }
 
-    function toggleCumple(id) {
-      observaciones = observaciones.map(o => {
-        if (o.id === id) {
-          return { ...o, cumple: o.cumple === 'Sí' ? 'No' : 'Sí' };
+        function seleccionarTurno(turnoSelec) {
+            appState.turno = turnoSelec;
+            const botones = document.querySelectorAll('.btn-turno');
+            botones.forEach(btn => {
+                btn.className = "btn-turno py-2.5 px-3 rounded-xl border text-sm font-medium transition-all-custom flex items-center justify-center gap-2 bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100";
+            });
+
+            const activeBtn = document.getElementById(`btn-turno-${turnoSelec.toLowerCase().replace('ñ', 'n')}`);
+            if (activeBtn) {
+                activeBtn.className = "btn-turno py-2.5 px-3 rounded-xl border-2 text-sm font-extrabold transition-all-custom flex items-center justify-center gap-2 bg-indigo-50 border-indigo-600 text-indigo-700 shadow-sm shadow-indigo-100";
+            }
+            actualizarEstadisticas();
         }
-        return o;
-      });
-      renderTabla();
-    }
 
-    function editarFila(id, campo, valor) {
-      observaciones = observaciones.map(o => {
-        if (o.id === id) {
-          if(campo === 'notas') {
-            return { ...o, notes: valor };
-          }
-          return { ...o, [campo]: valor };
+        function selectTempMomento(momNumero) {
+            appState.seleccionMomento = parseInt(momNumero);
+            const botones = document.querySelectorAll('.mom-btn');
+            botones.forEach(btn => {
+                btn.className = "mom-btn flex flex-col items-center justify-center py-3 px-1 rounded-xl border-2 transition-all-custom font-bold group bg-slate-50 border-slate-200/70 text-slate-600 hover:border-slate-300";
+            });
+
+            const btnActivo = document.getElementById(`btn-mom-${momNumero}`);
+            if (btnActivo) {
+                btnActivo.className = "mom-btn flex flex-col items-center justify-center py-3 px-1 rounded-xl border-2 transition-all-custom font-black group bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/25";
+                const labelSub = btnActivo.querySelector('span:last-child');
+                if (labelSub) labelSub.className = "text-[9px] uppercase tracking-tighter text-blue-100";
+            }
+
+            const descContainer = document.getElementById('mom-desc-container');
+            const descText = document.getElementById('mom-desc-text');
+            descText.innerHTML = descripcionesMomentos[momNumero];
+            descContainer.className = "mt-3 bg-blue-50 border border-blue-100 rounded-xl px-3.5 py-2.5 text-xs text-blue-900 leading-relaxed min-h-[46px] flex items-center gap-2 font-semibold";
         }
-        return o;
-      });
-      actualizarMetricas();
-    }
 
-    function eliminarFila(id) {
-      observaciones = observaciones.filter(o => o.id !== id);
-      renderTabla();
-      showNotification('Observación eliminada.', 'error');
-    }
+        function selectTempAccion(accionSelec) {
+            appState.seleccionAccion = accionSelec;
+            const botones = document.querySelectorAll('.acc-btn');
+            botones.forEach(btn => {
+                btn.className = "acc-btn py-3 px-2 rounded-xl border-2 text-sm font-bold transition-all-custom flex flex-col sm:flex-row items-center justify-center gap-2 bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100";
+            });
 
-    // --- CÁLCULO DE MÉTRICAS ---
-    function actualizarMetricas() {
-      const total = observaciones.length;
-      const cumplidas = observaciones.filter(o => o.cumple === 'Sí').length;
-      const porcentaje = total > 0 ? Math.round((cumplidas / total) * 100) : 0;
-
-      document.getElementById('counter-observaciones').innerText = `${total} Registradas`;
-      document.getElementById('metric-total').innerText = total;
-      document.getElementById('metric-cumplidas').innerText = cumplidas;
-      
-      const pctEl = document.getElementById('metric-porcentaje');
-      pctEl.innerText = `${porcentaje} %`;
-      
-      const badgeEl = document.getElementById('metric-meta-badge');
-
-      if (porcentaje >= 80) {
-        pctEl.className = "text-2xl font-black text-emerald-600";
-        badgeEl.innerHTML = `<span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold">META CUMPLIDA</span>`;
-      } else {
-        pctEl.className = "text-2xl font-black text-rose-600";
-        badgeEl.innerHTML = `<span class="bg-rose-100 text-rose-800 text-xs px-2.5 py-0.5 rounded-full font-bold">BAJO LA META</span>`;
-      }
-
-      document.getElementById('print-area').innerText = document.getElementById('input-area').value || 'Laboratorio Clínico';
-      document.getElementById('print-fecha').innerText = document.getElementById('input-fecha').value;
-      document.getElementById('print-turno').innerText = turno;
-      document.getElementById('print-auditor').innerText = document.getElementById('input-auditor').value || '(Por firmar)';
-    }
-
-    function seleccionarTurno(t) {
-      turno = t;
-      ['Mañana', 'Tarde', 'Noche'].forEach(x => {
-        const el = document.getElementById(`btn-turno-${x.toLowerCase().replace('ñ', 'n')}`);
-        if (x === t) {
-          el.className = "bg-blue-600 text-white text-xs font-semibold py-1.5 rounded-md shadow-sm";
-        } else {
-          el.className = "text-slate-600 hover:bg-slate-200/50 text-xs font-semibold py-1.5 rounded-md";
+            const btnActivo = document.getElementById(`btn-acc-${accionSelec.toLowerCase().replace('ó', 'o')}`);
+            if (btnActivo) {
+                if (accionSelec === 'Fricción') {
+                    btnActivo.className = "acc-btn py-3 px-2 rounded-xl border-2 text-sm font-extrabold transition-all-custom flex flex-col sm:flex-row items-center justify-center gap-2 bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-500/20";
+                    btnActivo.querySelector('i').className = "fa-solid fa-hands-bubbles text-emerald-100 text-lg";
+                } else if (accionSelec === 'Lavado') {
+                    btnActivo.className = "acc-btn py-3 px-2 rounded-xl border-2 text-sm font-extrabold transition-all-custom flex flex-col sm:flex-row items-center justify-center gap-2 bg-cyan-500 border-cyan-500 text-white shadow-md shadow-cyan-500/20";
+                    btnActivo.querySelector('i').className = "fa-solid fa-soap text-cyan-100 text-lg";
+                } else {
+                    btnActivo.className = "acc-btn py-3 px-2 rounded-xl border-2 text-sm font-extrabold transition-all-custom flex flex-col sm:flex-row items-center justify-center gap-2 bg-rose-500 border-rose-500 text-white shadow-md shadow-rose-500/20";
+                    btnActivo.querySelector('i').className = "fa-solid fa-triangle-exclamation text-rose-100 text-lg";
+                }
+            }
         }
-      });
-      actualizarMetricas();
-    }
 
-    // --- GESTIÓN DE HISTORIAL EN LA NUBE + BACKUP LOCAL ---
-    function guardarTurnoActual() {
-      const fechaVal = document.getElementById('input-fecha').value;
-      const areaVal = document.getElementById('input-area').value || 'Laboratorio Clínico';
-      const auditorVal = document.getElementById('input-auditor').value || 'Auditor no asignado';
-      const fAuditor = document.getElementById('input-firma-auditor').value;
-      const fSupervisor = document.getElementById('input-firma-supervisor').value;
+        function agregarFilaRapida() {
+            const horaInput = document.getElementById('obs-hora').value;
+            const categoriaSelect = document.getElementById('obs-categoria').value;
+            const comentarioInput = document.getElementById('obs-comentario').value.trim();
 
-      if (observaciones.length === 0) {
-        showNotification('No hay observaciones para guardar.', 'error');
-        return;
-      }
+            if (!horaInput) {
+                mostrarToast("Por favor, ingresa una hora válida.", true);
+                return;
+            }
 
-      const total = observaciones.length;
-      const cumplidas = observaciones.filter(o => o.cumple === 'Sí').length;
-      const porcentaje = Math.round((cumplidas / total) * 100);
+            const cumple = (appState.seleccionAccion === 'Fricción' || appState.seleccionAccion === 'Lavado') ? 'Sí' : 'No';
+            const comentarioFinal = comentarioInput !== "" ? comentarioInput : comentariosSugeridos[appState.seleccionMomento][appState.seleccionAccion];
 
-      const processedObs = observaciones.map(o => {
-        return {
-          hora: o.hora,
-          categoria: o.categoria,
-          momento: o.momento,
-          accion: o.accion,
-          cumple: o.cumple,
-          notas: o.notes || ''
+            const nuevaObservacion = {
+                id: Date.now(),
+                hora: horaInput,
+                categoria: categoriaSelect,
+                momento: appState.seleccionMomento,
+                accion: appState.seleccionAccion,
+                cumple: cumple,
+                comentario: comentarioFinal
+            };
+
+            appState.observaciones.unshift(nuevaObservacion);
+            renderizarTabla();
+            actualizarEstadisticas();
+
+            document.getElementById('obs-comentario').value = "";
+            mostrarToast("Observación registrada con éxito.");
+            incrementarHoraMinutos(3);
         }
-      });
 
-      const auditoria = {
-        id: `${fechaVal}-${turno}-${Date.now()}`,
-        fecha: fechaVal,
-        turno,
-        area: areaVal,
-        auditor: auditorVal,
-        observaciones: processedObs,
-        porcentajeCumplimiento: porcentaje,
-        firmaAuditor: fAuditor,
-        firmaSupervisor: fSupervisor
-      };
-
-      // 1. SIEMPRE GUARDAR LOCALMENTE COMO RESPALDO (Por si falla la nube o no hay señal)
-      let localHistorial = [];
-      const savedLocal = localStorage.getItem('local_historial_fallback');
-      if (savedLocal) {
-        localHistorial = JSON.parse(savedLocal);
-      }
-      
-      const existLocalIdx = localHistorial.findIndex(h => h.fecha === fechaVal && h.turno === turno);
-      if (existLocalIdx >= 0) {
-        localHistorial[existLocalIdx] = auditoria;
-      } else {
-        localHistorial.unshift(auditoria);
-      }
-      localStorage.setItem('local_historial_fallback', JSON.stringify(localHistorial));
-
-      // 2. ENVIAR A GOOGLE SHEETS SI ESTÁ CONFIGURADO
-      if (!googleScriptUrl) {
-        showNotification('Guardado en el celular. Para guardar en la nube colectiva, pega tu enlace en la pestaña de Configuración.', 'warning');
-        historial = localHistorial;
-        return;
-      }
-
-      document.getElementById('save-status-icon').className = "animate-spin text-indigo-400";
-      document.getElementById('save-status-text').innerText = "Subiendo reporte a la nube colectiva...";
-
-      fetch(googleScriptUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(auditoria)
-      })
-      .then(() => {
-        document.getElementById('save-status-icon').className = "text-emerald-400";
-        document.getElementById('save-status-icon').setAttribute('data-lucide', 'check-circle');
-        document.getElementById('save-status-text').innerText = "¡Excelente! Sincronizado en Google Sheets de forma virtual.";
-        showNotification('Sincronizado correctamente con Google Sheets.');
-        lucide.createIcons();
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById('save-status-icon').className = "text-rose-400";
-        document.getElementById('save-status-text').innerText = "Fallo de conexión. Los datos están respaldados de forma segura en tu celular.";
-        showNotification('Error de conexión a la nube. Resguardado localmente en el celular.', 'warning');
-        lucide.createIcons();
-      });
-    }
-
-    function obtenerHistorialNube() {
-      const container = document.getElementById('historial-container');
-      
-      if (!googleScriptUrl) {
-        // Fallback local directo si no está configurado Google Sheets
-        const savedLocal = localStorage.getItem('local_historial_fallback');
-        if (savedLocal) {
-          historial = JSON.parse(savedLocal);
-          renderHistorial(true);
-        } else {
-          container.innerHTML = `<p class="text-sm text-slate-400 text-center py-6">No hay registros locales ni nube configurada.</p>`;
+        function incrementarHoraMinutos(minutos) {
+            const horaVal = document.getElementById('obs-hora').value;
+            if (horaVal) {
+                let [hh, mm] = horaVal.split(':').map(Number);
+                mm += minutos;
+                if (mm >= 60) {
+                    hh = (hh + 1) % 24;
+                    mm = mm % 60;
+                }
+                document.getElementById('obs-hora').value = `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+            }
         }
-        return;
-      }
 
-      container.innerHTML = `
-        <p class="text-sm text-slate-400 text-center py-6 flex items-center justify-center gap-2">
-          <i data-lucide="refresh-cw" class="animate-spin text-indigo-500"></i> Recuperando base de datos colectiva de Google...
-        </p>
-      `;
-      lucide.createIcons();
-
-      fetch(googleScriptUrl)
-      .then(res => res.json())
-      .then(data => {
-        historial = data;
-        renderHistorial(false);
-      })
-      .catch(err => {
-        console.error(err);
-        // Mostrar historial local como salvavidas si falla la red
-        const savedLocal = localStorage.getItem('local_historial_fallback');
-        if (savedLocal) {
-          historial = JSON.parse(savedLocal);
-          renderHistorial(true);
-          showNotification('Sin internet. Cargando historial respaldado en este celular.', 'warning');
-        } else {
-          container.innerHTML = `<p class="text-sm text-rose-500 text-center py-6">Fallo de conexión a la nube. Verifica tu enlace en Configuración.</p>`;
+        function eliminarFila(id) {
+            appState.observaciones = appState.observaciones.filter(obs => obs.id !== id);
+            renderizarTabla();
+            actualizarEstadisticas();
+            mostrarToast("Observación eliminada.", true);
         }
-      });
-    }
 
-    function renderHistorial(esLocal = false) {
-      const container = document.getElementById('historial-container');
-      container.innerHTML = '';
+        function renderizarTabla() {
+            const tbody = document.getElementById('tabla-tbody');
+            tbody.innerHTML = "";
 
-      if (historial.length === 0) {
-        container.innerHTML = `<p class="text-sm text-slate-400 text-center py-6">Aún no hay auditorías colectivas registradas.</p>`;
-        return;
-      }
+            if (appState.observaciones.length === 0) {
+                tbody.innerHTML = `
+                    <tr id="empty-row" class="text-slate-400 text-center">
+                        <td colspan="8" class="py-10">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <i class="fa-solid fa-inbox text-4xl text-slate-300"></i>
+                                <p class="font-semibold">No se han registrado observaciones aún.</p>
+                                <p class="text-xs text-slate-400">Selecciona el momento y la acción arriba para agregar filas.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
 
-      historial.forEach(h => {
-        const div = document.createElement('div');
-        div.className = "bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer transition-all";
-        div.onclick = () => cargarAuditoriaGuardada(h);
-        
-        const cumpleBadge = h.porcentajeCumplimiento >= 80 
-          ? `<span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Meta Cumplida</span>`
-          : `<span class="bg-rose-100 text-rose-800 text-xs font-bold px-2.5 py-1 rounded-full border border-rose-200">Bajo Meta</span>`;
+            appState.observaciones.forEach((obs, index) => {
+                const numeroFila = appState.observaciones.length - index;
+                const cumpleBadge = obs.cumple === 'Sí' 
+                    ? `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-bold uppercase"><i class="fa-solid fa-circle-check"></i> Sí</span>`
+                    : `<span class="inline-flex items-center gap-1 bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-full text-xs font-bold uppercase"><i class="fa-solid fa-circle-xmark"></i> No</span>`;
 
-        const originBadge = esLocal 
-          ? `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-200">Sólo en celular</span>`
-          : `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-200">Sincronizado</span>`;
+                let accionBadge = '';
+                if (obs.accion === 'Fricción') {
+                    accionBadge = `<span class="text-emerald-700 font-bold flex items-center gap-1.5"><i class="fa-solid fa-hands-bubbles"></i> Fricción</span>`;
+                } else if (obs.accion === 'Lavado') {
+                    accionBadge = `<span class="text-cyan-700 font-bold flex items-center gap-1.5"><i class="fa-solid fa-soap"></i> Lavado</span>`;
+                } else {
+                    accionBadge = `<span class="text-rose-600 font-bold flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> Ninguna</span>`;
+                }
 
-        div.innerHTML = `
-          <div class="space-y-1">
-            <div class="flex items-center space-x-2">
-              <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-0.5 rounded-md">${h.fecha}</span>
-              <span class="bg-slate-200 text-slate-700 text-xs font-bold px-2 py-0.5 rounded">${h.turno}</span>
-              ${originBadge}
-            </div>
-            <h4 class="text-sm font-bold text-slate-800">${h.area}</h4>
-            <p class="text-xs text-slate-500"><strong>Auditor:</strong> ${h.auditor} | <strong>Oportunidades:</strong> ${h.observaciones.length}</p>
-          </div>
-          <div class="flex items-center space-x-4">
-            <div class="text-right">
-              <span class="text-[10px] text-slate-400 font-bold block">Cumplimiento</span>
-              <span class="text-xl font-bold ${h.porcentajeCumplimiento >= 80 ? 'text-emerald-600' : 'text-rose-600'}">${h.porcentajeCumplimiento}%</span>
-            </div>
-            ${cumpleBadge}
-            <div class="p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg"><i data-lucide="chevron-right"></i></div>
-          </div>
-        `;
-        container.appendChild(div);
-      });
-      lucide.createIcons();
-    }
-
-    function cargarAuditoriaGuardada(aud) {
-      document.getElementById('input-fecha').value = aud.fecha;
-      document.getElementById('input-area').value = aud.area;
-      document.getElementById('input-auditor').value = aud.auditor;
-      document.getElementById('input-firma-auditor').value = aud.firmaAuditor || '';
-      document.getElementById('input-firma-supervisor').value = aud.firmaSupervisor || '';
-      seleccionarTurno(aud.turno);
-      
-      observaciones = aud.observaciones.map((o, idx) => {
-        return {
-          id: idx + 1,
-          hora: o.hora,
-          categoria: o.categoria,
-          momento: o.momento,
-          accion: o.accion,
-          cumple: o.cumple,
-          notes: o.notas
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50 transition-colors duration-150";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-center font-bold text-slate-500 bg-slate-50/30">${numeroFila}</td>
+                    <td class="py-3 px-4 font-mono font-bold text-slate-600">${obs.hora}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-700">${obs.categoria}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 font-extrabold text-sm">${obs.momento}</span>
+                    </td>
+                    <td class="py-3 px-4">${accionBadge}</td>
+                    <td class="py-3 px-4 text-center">${cumpleBadge}</td>
+                    <td class="py-3 px-4 text-slate-600 text-xs italic font-normal leading-relaxed">${obs.comentario}</td>
+                    <td class="py-3 px-4 text-center no-print">
+                        <button onclick="eliminarFila(${obs.id})" class="text-slate-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition-colors">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
-      });
 
-      renderTabla();
-      cambiarPestana('auditoria');
-      showNotification('Auditoría seleccionada cargada con éxito.');
-    }
+        function actualizarEstadisticas() {
+            const total = appState.observaciones.length;
+            const cumplidas = appState.observaciones.filter(obs => obs.cumple === 'Sí').length;
+            const porcentaje = total > 0 ? Math.round((cumplidas / total) * 100) : 0;
 
-    // --- PRE-CARGA EJEMPLO INSM ---
-    function cargarEjemploOficial() {
-      document.getElementById('input-fecha').value = '2026-07-08';
-      document.getElementById('input-area').value = 'Laboratorio Clínico – INSM “Honorio Delgado – Hideyo Noguchi”';
-      document.getElementById('input-auditor').value = 'Lic. Mariana Torres Quispe (Enfermera de Control de Infecciones)';
-      document.getElementById('input-firma-auditor').value = 'Mariana Torres Q.';
-      document.getElementById('input-firma-supervisor').value = 'Dr. Alva Pérez';
-      seleccionarTurno('Mañana');
+            document.getElementById('kpi-total').innerText = total;
+            document.getElementById('kpi-cumplidas').innerText = cumplidas;
+            document.getElementById('kpi-porcentaje').innerText = `${porcentaje}%`;
 
-      observaciones = [
-        { id: 101, hora: '07:15', categoria: 'Tecnólogo médico', momento: 1, accion: 'Fricción', cumple: 'Sí', notes: 'Aplicó alcohol gel antes de tomar muestra de sangre al paciente.' },
-        { id: 102, hora: '07:42', categoria: 'Técnico de laboratorio', momento: 2, accion: 'Lavado', cumple: 'Sí', notes: 'Lavado con agua y jabón antes de centrifugar las muestras.' },
-        { id: 103, hora: '08:10', categoria: 'Tecnólogo médico', momento: 3, accion: 'Ninguna', cumple: 'No', notes: 'No realizó higiene de manos tras retirarse guantes con salpicadura de suero.' },
-        { id: 104, hora: '08:35', categoria: 'Médico patólogo', momento: 4, accion: 'Fricción', cumple: 'Sí', notes: 'Higiene de manos tras examinar bloque de biopsia.' },
-        { id: 105, hora: '09:05', categoria: 'Técnico de laboratorio', momento: 5, accion: 'Fricción', cumple: 'Sí', notes: 'Higiene tras tocar superficie de la mesa de trabajo.' },
-        { id: 106, hora: '09:30', categoria: 'Administrativo', momento: 1, accion: 'Ninguna', cumple: 'No', notes: 'Manipuló muestras para registro sin higiene de manos previa.' },
-        { id: 107, hora: '09:58', categoria: 'Tecnólogo médico', momento: 2, accion: 'Lavado', cumple: 'Sí', notes: 'Lavado de manos antes de preparar reactivos.' },
-        { id: 108, hora: '10:20', categoria: 'Técnico de laboratorio', momento: 4, accion: 'Fricción', cumple: 'Sí', notes: 'Higiene de manos después de manipular tubo de muestra.' },
-        { id: 109, hora: '10:45', categoria: 'Tecnólogo médico', momento: 3, accion: 'Fricción', cumple: 'Sí', notes: 'Higiene tras exposición a salpicadura de suero.' },
-        { id: 110, hora: '11:10', categoria: 'Médico patólogo', momento: 5, accion: 'Ninguna', cumple: 'No', notes: 'No realizó higiene tras contacto con microscopio compartido.' }
-      ];
+            const progressBar = document.getElementById('kpi-progress');
+            if (progressBar) progressBar.style.width = `${porcentaje}%`;
 
-      renderTabla();
-      showNotification('Se ha cargado el ejemplo oficial de auditoría (INSM).');
-    }
+            const badge = document.getElementById('status-badge');
+            if (total < 5) {
+                badge.className = "inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase bg-slate-800 text-slate-300 border border-slate-700";
+                badge.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Menos de 5 Obs. (Incompleto)`;
+            } else if (porcentaje >= 80) {
+                badge.className = "inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase bg-emerald-500 text-white shadow-lg shadow-emerald-500/15";
+                badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Meta Cumplida (>= 80%)`;
+            } else {
+                badge.className = "inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase bg-rose-600 text-white shadow-lg shadow-rose-500/15";
+                badge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Alerta de Cumplimiento (< 80%)`;
+            }
 
-    function limpiarFormulario() {
-      observaciones = [];
-      document.getElementById('input-area').value = '';
-      document.getElementById('input-auditor').value = '';
-      document.getElementById('input-firma-auditor').value = '';
-      document.getElementById('input-firma-supervisor').value = '';
-      renderTabla();
-      showNotification('Campos reiniciados.', 'warning');
-    }
+            document.getElementById('quick-counter').innerText = `Obs. N° ${total + 1}`;
 
-    // --- NAVEGACIÓN ENTRE PESTAÑAS ---
-    function cambiarPestana(target) {
-      activeTab = target;
-      ['auditoria', 'historial', 'configuracion', 'guia'].forEach(t => {
-        const tabEl = document.getElementById(`tab-${t}`);
-        const btnEl = document.getElementById(`tab-btn-${t}`);
-        
-        if (t === target) {
-          tabEl.classList.remove('hidden');
-          btnEl.className = "border-b-2 border-blue-600 py-4 px-1 text-sm font-semibold text-blue-600 flex items-center gap-2";
-        } else {
-          tabEl.classList.add('hidden');
-          btnEl.className = "border-b-2 border-transparent py-4 px-1 text-sm font-semibold text-slate-500 hover:text-slate-700 flex items-center gap-2";
+            // Sincronizar con vista de impresión
+            document.getElementById('print-area').innerText = appState.area || 'Laboratorio Clínico';
+            document.getElementById('print-fecha').innerText = appState.fecha;
+            document.getElementById('print-turno').innerText = appState.turno;
+            document.getElementById('print-auditor').innerText = appState.auditor || '(Por especificar)';
         }
-      });
 
-      if (target === 'historial') {
-        obtenerHistorialNube();
-      }
-    }
-  </script>
+        // --- CONEXIÓN GOOGLE SHEETS ---
+        function actualizarIndicadorConexion(conectado) {
+            const badge = document.getElementById('cloud-status-badge');
+            if (conectado) {
+                badge.className = "bg-emerald-600/20 text-emerald-300 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-500/40 flex items-center gap-1";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> <span>Conectado a Google Sheets</span>`;
+            } else {
+                badge.className = "bg-amber-500/20 text-amber-300 text-xs font-semibold px-2.5 py-1 rounded-full border border-amber-500/40 flex items-center gap-1";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> <span>Sin Enlazar a Google</span>`;
+            }
+        }
+
+        function guardarUrlScript() {
+            const url = document.getElementById('url-script').value.trim();
+            if (!url) {
+                mostrarToast("La URL no puede estar vacía.", true);
+                return;
+            }
+            googleScriptUrl = url;
+            localStorage.setItem('google_script_url', url);
+            actualizarIndicadorConexion(true);
+            mostrarToast("Conexión con Google Sheets guardada.");
+            cambiarPestana('auditoria');
+        }
+
+        function guardarTurnoActual() {
+            if (appState.observaciones.length === 0) {
+                mostrarToast("No hay observaciones en la tabla para guardar.", true);
+                return;
+            }
+
+            // Guardado automático del enlace si el usuario lo pegó pero olvidó pulsar guardar
+            const urlInputVal = document.getElementById('url-script').value.trim();
+            if (urlInputVal && urlInputVal !== googleScriptUrl) {
+                googleScriptUrl = urlInputVal;
+                localStorage.setItem('google_script_url', urlInputVal);
+                actualizarIndicadorConexion(true);
+            }
+
+            const total = appState.observaciones.length;
+            const cumplidas = appState.observaciones.filter(o => o.cumple === 'Sí').length;
+            const porcentaje = Math.round((cumplidas / total) * 100);
+
+            const processedObs = appState.observaciones.map(o => ({
+                hora: o.hora,
+                categoria: o.categoria,
+                momento: o.momento,
+                accion: o.accion,
+                cumple: o.cumple,
+                notas: o.comentario || ''
+            }));
+
+            const auditoria = {
+                id: `${appState.fecha}-${appState.turno}-${Date.now()}`,
+                fecha: appState.fecha,
+                turno: appState.turno,
+                area: appState.area,
+                auditor: appState.auditor || 'Sin nombre',
+                observaciones: processedObs,
+                porcentajeCumplimiento: porcentaje,
+                firmaAuditor: '', 
+                firmaSupervisor: appState.supervisor
+            };
+
+            // Guardar localmente como respaldo
+            let localHistorial = JSON.parse(localStorage.getItem('local_historial_fallback') || '[]');
+            const existLocalIdx = localHistorial.findIndex(h => h.fecha === appState.fecha && h.turno === appState.turno);
+            if (existLocalIdx >= 0) {
+                localHistorial[existLocalIdx] = auditoria;
+            } else {
+                localHistorial.unshift(auditoria);
+            }
+            localStorage.setItem('local_historial_fallback', JSON.stringify(localHistorial));
+
+            if (!googleScriptUrl) {
+                mostrarToast("Guardado localmente en el celular. Para guardarlo de forma colectiva vincula Google Sheets en Configuración.", "warning");
+                return;
+            }
+
+            document.getElementById('save-status-icon').className = "fa-solid fa-spinner animate-spin text-indigo-400";
+            document.getElementById('save-status-text').innerText = "Subiendo reporte a la nube colectiva...";
+
+            fetch(googleScriptUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(auditoria)
+            })
+            .then(() => {
+                document.getElementById('save-status-icon').className = "fa-solid fa-cloud-arrow-up text-emerald-400";
+                document.getElementById('save-status-text').innerText = "¡Excelente! Sincronizado en la nube de Google Sheets con éxito.";
+                mostrarToast("Sincronizado correctamente con Google Sheets.");
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('save-status-icon').className = "fa-solid fa-triangle-exclamation text-rose-400";
+                document.getElementById('save-status-text').innerText = "Fallo de conexión. Datos respaldados en la memoria del celular.";
+                mostrarToast("Error de red. Datos guardados localmente.", "warning");
+            });
+        }
+
+        function obtenerHistorialNube() {
+            const container = document.getElementById('historial-container');
+            if (!googleScriptUrl) {
+                const savedLocal = localStorage.getItem('local_historial_fallback');
+                if (savedLocal) {
+                    historial = JSON.parse(savedLocal);
+                    renderHistorial(true);
+                } else {
+                    container.innerHTML = `<p class="text-sm text-slate-400 text-center py-6">Vincule Google Sheets para ver el historial consolidado.</p>`;
+                }
+                return;
+            }
+
+            container.innerHTML = `<p class="text-sm text-slate-400 text-center py-6 flex items-center justify-center gap-2"><i class="fa-solid fa-arrows-rotate animate-spin text-indigo-500"></i> Recuperando base de datos colectiva...</p>`;
+
+            fetch(googleScriptUrl)
+            .then(res => res.json())
+            .then(data => {
+                historial = data;
+                renderHistorial(false);
+            })
+            .catch(err => {
+                console.error(err);
+                const savedLocal = localStorage.getItem('local_historial_fallback');
+                if (savedLocal) {
+                    historial = JSON.parse(savedLocal);
+                    renderHistorial(true);
+                } else {
+                    container.innerHTML = `<p class="text-sm text-rose-500 text-center py-6">No se pudo obtener datos de la nube. Compruebe la conexión.</p>`;
+                }
+            });
+        }
+
+        function renderHistorial(esLocal = false) {
+            const container = document.getElementById('historial-container');
+            container.innerHTML = '';
+
+            if (historial.length === 0) {
+                container.innerHTML = `<p class="text-sm text-slate-400 text-center py-6">Aún no hay auditorías colectivas registradas.</p>`;
+                return;
+            }
+
+            historial.forEach(h => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer transition-all";
+                div.onclick = () => cargarAuditoriaGuardada(h);
+                
+                const cumpleBadge = h.porcentajeCumplimiento >= 80 
+                    ? `<span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Meta Cumplida</span>`
+                    : `<span class="bg-rose-100 text-rose-800 text-xs font-bold px-2.5 py-1 rounded-full border border-rose-200">Bajo Meta</span>`;
+
+                const originBadge = esLocal 
+                    ? `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-200">En celular</span>`
+                    : `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-200">Sincronizado</span>`;
+
+                div.innerHTML = `
+                    <div class="space-y-1">
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-0.5 rounded-md">${h.fecha}</span>
+                            <span class="bg-slate-200 text-slate-700 text-xs font-bold px-2 py-0.5 rounded">${h.turno}</span>
+                            ${originBadge}
+                        </div>
+                        <h4 class="text-sm font-bold text-slate-800">${h.area}</h4>
+                        <p class="text-xs text-slate-500"><strong>Personal:</strong> ${h.auditor} | <strong>Filas:</strong> ${h.observaciones.length}</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <span class="text-[10px] text-slate-400 font-bold block">Cumplimiento</span>
+                            <span class="text-xl font-bold ${h.porcentajeCumplimiento >= 80 ? 'text-emerald-600' : 'text-rose-600'}">${h.porcentajeCumplimiento}%</span>
+                        </div>
+                        ${cumpleBadge}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function cargarAuditoriaGuardada(aud) {
+            document.getElementById('input-fecha').value = aud.fecha;
+            document.getElementById('input-area').value = aud.area;
+            document.getElementById('input-auditor').value = aud.auditor;
+            document.getElementById('aud-supervisor').value = aud.firmaSupervisor || "Dr. LUIS GUILLERMO JURADO CRISPIN";
+            document.getElementById('firma-nombre-supervisor').innerText = aud.firmaSupervisor || "Dr. LUIS GUILLERMO JURADO CRISPIN";
+            seleccionarTurno(aud.turno);
+            
+            observaciones = aud.observaciones.map((o, idx) => ({
+                id: idx + 1,
+                hora: o.hora,
+                categoria: o.categoria,
+                momento: o.momento,
+                accion: o.accion,
+                cumple: o.cumple,
+                comentario: o.notas
+            }));
+
+            appState.fecha = aud.fecha;
+            appState.area = aud.area;
+            appState.auditor = aud.auditor;
+            appState.supervisor = aud.firmaSupervisor || "Dr. LUIS GUILLERMO JURADO CRISPIN";
+            appState.observaciones = observaciones;
+
+            renderizarTabla();
+            actualizarEstadisticas();
+            cambiarPestana('auditoria');
+            mostrarToast("Auditoría seleccionada cargada.");
+        }
+
+        function cargarDatosEjemplo() {
+            appState.observaciones = [
+                { id: 1005, hora: "09:05", categoria: "Técnico de laboratorio", momento: 5, accion: "Fricción", cumple: "Sí", comentario: "Higiene tras tocar superficie de la mesa de trabajo." },
+                { id: 1004, hora: "08:35", categoria: "Médico patólogo", momento: 4, accion: "Fricción", cumple: "Sí", comentario: "Higiene de manos tras examinar bloque de biopsia." },
+                { id: 1003, hora: "08:10", categoria: "Tecnólogo médico", momento: 3, accion: "Ninguna", cumple: "No", comentario: "No realizó higiene de manos tras retirarse guantes con salpicadura de suero." },
+                { id: 1002, hora: "07:42", categoria: "Técnico de laboratorio", momento: 2, accion: "Lavado", cumple: "Sí", comentario: "Lavado con agua y jabón antes de centrifugar las muestras." },
+                { id: 1001, hora: "07:15", categoria: "Tecnólogo médico", momento: 1, accion: "Fricción", cumple: "Sí", comentario: "Aplicó alcohol gel antes de tomar muestra de sangre al paciente." }
+            ];
+
+            renderizarTabla();
+            actualizarEstadisticas();
+            mostrarToast("Datos de demostración cargados.");
+        }
+
+        function limpiarTodo() {
+            appState.observaciones = [];
+            document.getElementById('input-area').value = "Laboratorio Clínico";
+            document.getElementById('input-auditor').value = "";
+            appState.area = "Laboratorio Clínico";
+            appState.auditor = "";
+            renderizarTabla();
+            actualizarEstadisticas();
+            setActualTime();
+            mostrarToast("Ficha restablecida. Tabla vacía al inicio.", true);
+        }
+
+        function toggleHelpModal() {
+            document.getElementById('guide-modal').classList.toggle('hidden');
+        }
+
+        function mostrarToast(mensaje, esError = false) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const text = document.getElementById('toast-text');
+
+            text.innerText = mensaje;
+            if (esError) {
+                icon.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500"></i>`;
+                toast.className = "fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 max-w-md border border-rose-500/20";
+            } else {
+                icon.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i>`;
+                toast.className = "fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 max-w-md border border-emerald-500/20";
+            }
+            toast.classList.remove('hidden');
+            setTimeout(() => { toast.classList.add('hidden'); }, 3500);
+        }
+
+        function cambiarPestana(target) {
+            activeTab = target;
+            ['auditoria', 'historial', 'configuracion', 'guia'].forEach(t => {
+                const tabEl = document.getElementById(`tab-${t}`);
+                const btnEl = document.getElementById(`tab-btn-${t}`);
+                
+                if (t === target) {
+                    tabEl.classList.remove('hidden');
+                    btnEl.className = "border-b-2 border-blue-600 py-4 px-1 text-sm font-bold text-blue-600 flex items-center gap-2 whitespace-nowrap";
+                } else {
+                    tabEl.classList.add('hidden');
+                    btnEl.className = "border-b-2 border-transparent py-4 px-1 text-sm font-semibold text-slate-500 hover:text-slate-700 flex items-center gap-2 whitespace-nowrap";
+                }
+            });
+
+            if (target === 'historial') {
+                obtenerHistorialNube();
+            }
+        }
+
+        function exportarCSV() {
+            if (appState.observaciones.length === 0) {
+                mostrarToast("No hay registros que exportar en este turno.", true);
+                return;
+            }
+
+            let csvContent = "\uFEFF";
+            csvContent += `FICHA DE AUDITORÍA OMS - CUMPLIMIENTO HIGIENE DE MANOS\r\n`;
+            csvContent += `Fecha:,${appState.fecha}\r\n`;
+            csvContent += `Turno:,${appState.turno}\r\n`;
+            csvContent += `Servicio:,${appState.area}\r\n`;
+            csvContent += `Nombre de Personal:,${appState.auditor}\r\n\r\n`;
+            csvContent += `N°,Hora,Categoría profesional,Momento (1 a 5),Acción realizada,¿Cumple?,Observaciones\r\n`;
+
+            const ordenadas = [...appState.observaciones].reverse();
+            ordenadas.forEach((obs, idx) => {
+                const filaStr = `"${idx + 1}","${obs.hora}","${obs.categoria.replace(/"/g, '""')}","${obs.momento}","${obs.accion}","${obs.cumple}","${obs.comentario.replace(/"/g, '""')}"`;
+                csvContent += filaStr + "\r\n";
+            });
+
+            const total = appState.observaciones.length;
+            const cumplidas = appState.observaciones.filter(obs => obs.cumple === 'Sí').length;
+            const cumplimiento = total > 0 ? Math.round((cumplidas / total) * 100) : 0;
+
+            csvContent += `\r\n`;
+            csvContent += `TOTAL OPORTUNIDADES:,${total}\r\n`;
+            csvContent += `TOTAL CUMPLIDAS:,${cumplidas}\r\n`;
+            csvContent += `PORCENTAJE DE CUMPLIMIENTO:,${cumplimiento}%\r\n`;
+            csvContent += `META INSTITUCIONAL:,80%\r\n`;
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.setAttribute("href", URL.createObjectURL(blob));
+            link.setAttribute("download", `Auditoria_Higiene_Manos_${appState.fecha}_Turno_${appState.turno}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            mostrarToast("Archivo de auditoría CSV descargado.");
+        }
+    </script>
 </body>
 </html>
-function doPost(e) {
-  try {
-    // Acceder a la hoja de cálculo activa
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    
-    // Si la hoja está completamente vacía, creamos los encabezados automáticamente
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow([
-        "Fecha de Registro (Sistema)", 
-        "ID de Auditoría",
-        "Fecha del Turno", 
-        "Turno Evaluado", 
-        "Área o Servicio", 
-        "Auditor / Observador", 
-        "Firma Auditor", 
-        "Firma Supervisor", 
-        "% Cumplimiento General",
-        "N° de Observación", 
-        "Hora de Obs.", 
-        "Categoría Profesional", 
-        "Momento OMS", 
-        "Acción Realizada", 
-        "¿Cumple con la Higiene?", 
-        "Detalles / Comentarios"
-      ]);
-      
-      // Aplicar color azul elegante, texto blanco y negrita a la cabecera
-      sheet.getRange(1, 1, 1, 16)
-           .setBackground("#1e3a8a") 
-           .setFontColor("#ffffff")
-           .setFontWeight("bold")
-           .setHorizontalAlignment("center");
-      
-      // Ajustar anchos iniciales de columnas para una mejor lectura
-      sheet.setColumnWidth(1, 180);
-      sheet.setColumnWidth(2, 180);
-      sheet.setColumnWidth(3, 100);
-      sheet.setColumnWidth(4, 100);
-      sheet.setColumnWidth(5, 200);
-      sheet.setColumnWidth(6, 200);
-    }
-    
-    // Decodificar la carga útil JSON enviada por la aplicación
-    var data = JSON.parse(e.postData.contents);
-    
-    // Extraer campos generales
-    var id = data.id || "";
-    var fecha = data.fecha || "";
-    var turno = data.turno || "";
-    var area = data.area || "";
-    var auditor = data.auditor || "";
-    var pct = data.porcentajeCumplimiento !== undefined ? data.porcentajeCumplimiento + "%" : "";
-    var fAuditor = data.firmaAuditor || "";
-    var fSupervisor = data.firmaSupervisor || "";
-    var obsList = data.observaciones || [];
-    
-    var timestamp = new Date(); // Fecha y hora exacta de guardado
-    
-    // Recorremos la lista de observaciones y las guardamos como registros independientes
-    // Esto facilita la creación de tablas dinámicas y gráficos estadísticos en Sheets
-    for (var i = 0; i < obsList.length; i++) {
-      var obs = obsList[i];
-      sheet.appendRow([
-        timestamp,
-        id,
-        fecha,
-        turno,
-        area,
-        auditor,
-        fAuditor,
-        fSupervisor,
-        pct,
-        (i + 1),
-        obs.hora || "",
-        obs.categoria || "",
-        "Momento " + (obs.momento || ""),
-        obs.accion || "",
-        obs.cumple || "",
-        obs.notas || ""
-      ]);
-    }
