@@ -110,6 +110,7 @@
         <!-- PESTAÑA 1: FORMULARIO DE AUDITORÍA ACTIVA  -->
         <!-- ========================================== -->
         <div id="tab-auditoria" class="space-y-6">
+            
             <!-- SECCIÓN 1: Datos Generales de la Auditoría -->
             <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 transition-all-custom">
                 <div class="border-b border-slate-100 pb-4 mb-4 flex items-center gap-2.5 text-blue-800 font-bold text-lg">
@@ -155,7 +156,18 @@
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 pointer-events-none">
                                 <i class="fa-solid fa-user-doctor"></i>
                             </span>
-                            <input type="text" id="aud-auditor" placeholder="Nombre del personal observado" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all-custom text-slate-700 font-medium">
+                            <select id="aud-auditor" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all-custom text-slate-700 font-medium">
+                                <option value="" disabled selected>Seleccione el personal observado...</option>
+                                <option value="BILL CERDAN FABIAN">BILL CERDAN FABIAN</option>
+                                <option value="LIZETH HERRERA ARIAS">LIZETH HERRERA ARIAS</option>
+                                <option value="JAZMINE LIJA FABABA">JAZMINE LIJA FABABA</option>
+                                <option value="SERGIO DE LA CRUZ">SERGIO DE LA CRUZ</option>
+                                <option value="JOSE ROCA">JOSE ROCA</option>
+                                <option value="LUIS OTINIANO">LUIS OTINIANO</option>
+                                <option value="GULIANA OTAYZA">GULIANA OTAYZA</option>
+                                <option value="LUIS JURADO CRISPIN">LUIS JURADO CRISPIN</option>
+                                <option value="LUIS VICENTE">LUIS VICENTE</option>
+                            </select>
                         </div>
                     </div>
 
@@ -514,14 +526,6 @@
 
     </main>
 
-    <!-- Pie de Página -->
-    <footer class="bg-slate-900 text-slate-400 text-xs py-5 border-t border-slate-850 mt-12 print:hidden">
-        <div class="max-w-7xl mx-auto px-4 text-center space-y-1">
-            <p>© 2026 Sistema Integral de Control de Infecciones Intrahospitalarias - Laboratorio Clínico.</p>
-            <p class="text-[10px] text-slate-500">Diseñado conforme a la Guía Técnica de la Organización Mundial de la Salud (OMS) para la Evaluación del Lavado de Manos.</p>
-        </div>
-    </footer>
-
     <!-- Modal de Guía OMS de los 5 Momentos -->
     <div id="guide-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden animate-fade-in">
@@ -538,6 +542,13 @@
             </div>
         </div>
     </div>
+
+    <footer class="bg-slate-900 text-slate-400 text-xs py-5 border-t border-slate-850 mt-12 print:hidden">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-1">
+            <p>© 2026 Sistema Integral de Control de Infecciones Intrahospitalarias - Laboratorio Clínico.</p>
+            <p class="text-[10px] text-slate-500">Diseñado conforme a la Guía Técnica de la Organización Mundial de la Salud (OMS) para la Evaluación del Lavado de Manos.</p>
+        </div>
+    </footer>
 
     <!-- LÓGICA JAVASCRIPT CON MOTOR DE ESTADOS INTEGRAL Y NUBE -->
     <script>
@@ -582,7 +593,7 @@
             fecha: new Date().toISOString().split('T')[0],
             turno: "Mañana",
             area: "Laboratorio Clínico",
-            auditor: "", // Vacío por defecto
+            auditor: "", // Vacío por defecto para forzar selección
             supervisor: "Dr. LUIS GUILLERMO JURADO CRISPIN", // Supervisor predeterminado fijo
             observaciones: [], // TABLA EN BLANCO AL INICIAR
             seleccionMomento: 1,
@@ -629,7 +640,7 @@
             // Escuchar cambios de datos de cabecera
             document.getElementById('aud-fecha').addEventListener('change', (e) => appState.fecha = e.target.value);
             document.getElementById('aud-area').addEventListener('input', (e) => appState.area = e.target.value);
-            document.getElementById('aud-auditor').addEventListener('input', (e) => appState.auditor = e.target.value);
+            document.getElementById('aud-auditor').addEventListener('change', (e) => appState.auditor = e.target.value);
             document.getElementById('aud-supervisor').addEventListener('input', (e) => {
                 appState.supervisor = e.target.value;
                 document.getElementById('firma-nombre-supervisor').innerText = e.target.value || "(Supervisor)";
@@ -1022,9 +1033,9 @@
         }
 
         function cargarAuditoriaGuardada(aud) {
-            document.getElementById('input-fecha').value = aud.fecha;
-            document.getElementById('input-area').value = aud.area;
-            document.getElementById('input-auditor').value = aud.auditor;
+            document.getElementById('aud-fecha').value = aud.fecha;
+            document.getElementById('aud-area').value = aud.area;
+            document.getElementById('aud-auditor').value = aud.auditor || "";
             document.getElementById('aud-supervisor').value = aud.firmaSupervisor || "Dr. LUIS GUILLERMO JURADO CRISPIN";
             document.getElementById('firma-nombre-supervisor').innerText = aud.firmaSupervisor || "Dr. LUIS GUILLERMO JURADO CRISPIN";
             seleccionarTurno(aud.turno);
@@ -1041,7 +1052,7 @@
 
             appState.fecha = aud.fecha;
             appState.area = aud.area;
-            appState.auditor = aud.auditor;
+            appState.auditor = aud.auditor || "";
             appState.supervisor = aud.firmaSupervisor || "Dr. LUIS GUILLERMO JURADO CRISPIN";
             appState.observaciones = observaciones;
 
@@ -1052,6 +1063,8 @@
         }
 
         function cargarDatosEjemplo() {
+            appState.auditor = "BILL CERDAN FABIAN";
+            document.getElementById('aud-auditor').value = appState.auditor;
             appState.observaciones = [
                 { id: 1005, hora: "09:05", categoria: "Técnico de laboratorio", momento: 5, accion: "Fricción", cumple: "Sí", comentario: "Higiene tras tocar superficie de la mesa de trabajo." },
                 { id: 1004, hora: "08:35", categoria: "Médico patólogo", momento: 4, accion: "Fricción", cumple: "Sí", comentario: "Higiene de manos tras examinar bloque de biopsia." },
@@ -1067,8 +1080,8 @@
 
         function limpiarTodo() {
             appState.observaciones = [];
-            document.getElementById('input-area').value = "Laboratorio Clínico";
-            document.getElementById('input-auditor').value = "";
+            document.getElementById('aud-area').value = "Laboratorio Clínico";
+            document.getElementById('aud-auditor').value = "";
             appState.area = "Laboratorio Clínico";
             appState.auditor = "";
             renderizarTabla();
@@ -1079,23 +1092,6 @@
 
         function toggleHelpModal() {
             document.getElementById('guide-modal').classList.toggle('hidden');
-        }
-
-        function mostrarToast(mensaje, esError = false) {
-            const toast = document.getElementById('toast');
-            const icon = document.getElementById('toast-icon');
-            const text = document.getElementById('toast-text');
-
-            text.innerText = mensaje;
-            if (esError) {
-                icon.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500"></i>`;
-                toast.className = "fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 max-w-md border border-rose-500/20";
-            } else {
-                icon.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i>`;
-                toast.className = "fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 max-w-md border border-emerald-500/20";
-            }
-            toast.classList.remove('hidden');
-            setTimeout(() => { toast.classList.add('hidden'); }, 3500);
         }
 
         function cambiarPestana(target) {
